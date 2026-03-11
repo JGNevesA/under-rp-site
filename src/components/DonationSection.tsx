@@ -326,20 +326,17 @@ const DonationSection = () => {
                   </div>
 
                   {/* Botão premium */}
-                  <button
+                  <a
+                    href="https://discord.gg/VWXkSt3Y"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     id={`btn-${item.id}`}
-                    className="relative w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 overflow-hidden active:scale-95 group/btn"
+                    className="relative w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 overflow-hidden active:scale-95 group/btn text-center block"
                     style={{
                       background: item.isPopular
                         ? 'linear-gradient(135deg, #2563eb, #7c3aed, #2563eb)'
                         : 'linear-gradient(135deg, #1e40af, #2563eb)',
                       backgroundSize: '200% 200%',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLButtonElement).style.backgroundPosition = '100% 100%';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLButtonElement).style.backgroundPosition = '0% 0%';
                     }}
                   >
                     {/* Shimmer */}
@@ -347,7 +344,7 @@ const DonationSection = () => {
                     <span className="relative z-10 text-white drop-shadow-sm">
                       {item.buttonText || '💜 Doar'}
                     </span>
-                  </button>
+                  </a>
                 </div>
               </div>
             ))}

@@ -94,17 +94,17 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <button className="group px-8 py-4 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-black font-bold text-lg rounded-xl transition-all duration-300 hover:scale-105 shadow-xl shadow-amber-500/20 flex items-center gap-2">
+        {/* CTA Button */}
+        <div className="flex items-center justify-center mb-16">
+          <a
+            href="#whitelist"
+            className="group px-8 py-4 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-black font-bold text-lg rounded-xl transition-all duration-300 hover:scale-105 shadow-xl shadow-amber-500/20 flex items-center gap-2"
+          >
             Jogar Agora
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </button>
-          <button className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold text-lg rounded-xl transition-all duration-300 border border-white/10 hover:border-white/20">
-            Saiba Mais
-          </button>
+          </a>
         </div>
 
         {/* Scroll Indicator */}

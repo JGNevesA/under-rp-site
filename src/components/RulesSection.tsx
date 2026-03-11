@@ -112,7 +112,7 @@ const RulesSection = () => {
               </p>
             </div>
             <a
-              href="https://discord.com/channels/1460473286264750349/1478131702458220574"
+              href="https://discord.com/channels/1460473286264750349/1480447439059292200"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 rounded-lg border border-gray-700 text-white font-medium hover:bg-white/5 transition-colors flex-shrink-0 inline-flex items-center gap-2"

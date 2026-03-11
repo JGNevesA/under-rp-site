@@ -23,7 +23,9 @@ const Footer = () => {
             <div className="flex items-center gap-3">
               {/* Discord */}
               <a
-                href="#"
+                href="https://discord.gg/VWXkSt3Y"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/5 hover:bg-[#5865F2] flex items-center justify-center text-gray-400 hover:text-white transition-all duration-300 border border-white/10 hover:border-[#5865F2]"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -115,11 +117,12 @@ const Footer = () => {
                 { name: 'Termos de Uso', href: '#' },
                 { name: 'Política de Privacidade', href: '#' },
                 { name: 'Política de Reembolso', href: '#' },
-                { name: 'Regras do Servidor', href: '#regras' },
+                { name: 'Regras do Servidor', href: 'https://discord.com/channels/1460473286264750349/1480447439059292200', external: true },
               ].map((item) => (
                 <li key={item.name}>
                   <a
                     href={item.href}
+                    {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
                     {item.name}
