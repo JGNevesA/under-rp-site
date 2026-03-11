@@ -1,21 +1,16 @@
 import { useState, useEffect } from 'react';
-
-interface User {
-  id?: string;
-  discord_id?: string;
-  steam_id?: string;
-  username: string;
-  global_name: string;
-  avatar: string;
-  source: 'discord' | 'steam';
-}
+import { User } from '../App';
 
 const API_URL = 'https://underrp-api.onrender.com';
 
-const Navbar = () => {
+interface NavbarProps {
+  user: User | null;
+  setUser: (user: User | null) => void;
+}
+
+const Navbar = ({ user, setUser }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -26,39 +21,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check for token in URL (after Discord redirect)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    if (token) {
-      localStorage.setItem('auth_token', token);
-      // Clean URL
-      window.history.replaceState({}, '', window.location.pathname);
-    }
 
-    // Load user from token
-    const savedToken = localStorage.getItem('auth_token');
-    if (savedToken) {
-      fetchUser(savedToken);
-    }
-  }, []);
-
-  const fetchUser = async (token: string) => {
-    try {
-      const res = await fetch(`${API_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      } else {
-        localStorage.removeItem('auth_token');
-        setUser(null);
-      }
-    } catch {
-      console.error('Erro ao buscar usuário');
-    }
-  };
 
   const handleDiscordLogin = () => {
     window.location.href = `${API_URL}/auth/discord`;

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
@@ -7,7 +8,51 @@ import WhitelistSection from './components/WhitelistSection';
 import SupportSection from './components/SupportSection';
 import Footer from './components/Footer';
 
+export interface User {
+  id?: string;
+  discord_id?: string;
+  steam_id?: string;
+  username: string;
+  global_name: string;
+  avatar: string;
+  source: 'discord' | 'steam';
+}
+
+const API_URL = 'https://underrp-api.onrender.com';
+
 function App() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('auth_token', token);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    const savedToken = localStorage.getItem('auth_token');
+    if (savedToken) {
+      fetchUser(savedToken);
+    }
+  }, []);
+
+  const fetchUser = async (token: string) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+      }
+    } catch {
+      console.error('Erro ao buscar usuário');
+    }
+  };
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       {/* Background Grid Pattern */}
@@ -20,13 +65,13 @@ function App() {
 
       {/* Content */}
       <div className="relative z-10">
-        <Navbar />
+        <Navbar user={user} setUser={setUser} />
         <main>
           <HeroSection />
           <AboutSection />
           <RulesSection />
           <DonationSection />
-          <WhitelistSection />
+          <WhitelistSection user={user} />
           <SupportSection />
         </main>
         <Footer />
