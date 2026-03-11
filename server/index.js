@@ -116,7 +116,8 @@ app.get('/auth/discord/callback', async (req, res) => {
       {
         headers: { 
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept-Encoding': 'application/json'
+          'Accept-Encoding': 'application/json',
+          'User-Agent': 'UnderRP-Auth/1.0 (https://underrp-api.onrender.com)'
         },
       }
     );
@@ -127,7 +128,8 @@ app.get('/auth/discord/callback', async (req, res) => {
     const userResponse = await axios.get('https://discord.com/api/users/@me', {
       headers: { 
         Authorization: `Bearer ${access_token}`,
-        'Accept-Encoding': 'application/json'
+        'Accept-Encoding': 'application/json',
+        'User-Agent': 'UnderRP-Auth/1.0 (https://underrp-api.onrender.com)'
       },
     });
 
