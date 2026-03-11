@@ -114,7 +114,10 @@ app.get('/auth/discord/callback', async (req, res) => {
         scope: 'identify email',
       }),
       {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept-Encoding': 'application/json'
+        },
       }
     );
 
@@ -122,7 +125,10 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     // Fetch user data from Discord
     const userResponse = await axios.get('https://discord.com/api/users/@me', {
-      headers: { Authorization: `Bearer ${access_token}` },
+      headers: { 
+        Authorization: `Bearer ${access_token}`,
+        'Accept-Encoding': 'application/json'
+      },
     });
 
     const discordUser = userResponse.data;
