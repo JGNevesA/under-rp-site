@@ -166,86 +166,78 @@ const BanHistory = () => {
           </div>
         )}
 
-        {/* Bans List / Empty State */}
-        {token && !isLoading && !error && (
+        {/* Bans List / Tickets Panel */}
+        {token && !isLoading && (
           <main className="flex flex-col gap-8">
-            {bans.length === 0 ? (
-              <div className="bg-[#1c1c1e] border border-white/5 rounded-xl p-8 shadow-2xl">
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="font-poppins text-2xl font-bold text-[#84cc16] uppercase tracking-wide">
-                    TICKETS DE SUPORTE
-                  </h2>
-                  <button className="bg-transparent border border-white/20 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-white/5 transition-colors">
-                    Novo
-                  </button>
-                </div>
-                
-                <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
-                  <div className="flex-1">Categoria</div>
-                  <div className="flex-[2]">Titulo</div>
-                  <div className="w-32 text-center">Estado</div>
-                  <div className="w-48 text-right">Ultima Atualiação</div>
-                </div>
-                
+            <div className="bg-[#1c1c1e] border border-white/5 rounded-xl p-8 shadow-2xl">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="font-poppins text-2xl font-bold text-[#84cc16] uppercase tracking-wide">
+                  TICKETS DE SUPORTE
+                </h2>
+                <button className="bg-transparent border border-white/20 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-white/5 transition-colors">
+                  Novo
+                </button>
+              </div>
+              
+              <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
+                <div className="w-48 pl-2">Categoria</div>
+                <div className="flex-1">Titulo</div>
+                <div className="w-32 text-center">Estado</div>
+                <div className="w-48 text-right pr-2">Ultima Atualização</div>
+              </div>
+              
+              {bans.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-[#52525b] font-medium text-sm">Nenhum Tíquete de Suporte</p>
                 </div>
-              </div>
-            ) : (
-              bans.map((ban) => {
-                const config = getStatusConfig(ban);
-                return (
-                  <article key={ban.id} className="bg-[#18181b] border border-white/10 rounded-2xl p-8 relative overflow-hidden transition-all duration-300 hover:border-white/20 hover:-translate-y-1 shadow-2xl">
-                    <div className={`absolute top-0 left-0 w-1 h-full ${config.bg}`}></div>
-                    
-                    <div className="flex justify-between items-center mb-6 pb-5 border-b border-white/10">
-                      <h2 className="font-poppins text-2xl font-bold" style={{ color: config.color }}>{config.label}</h2>
-                      {ban.status === 'active' && !ban.appeal_status && (
-                        <button 
-                          className="bg-white/5 border border-white/10 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:border-[#f59e0b] hover:text-[#facc15]"
-                          onClick={() => openAppealModal(ban.id, config.label, ban.reason)}
-                        >
-                          Criar Apelo
-                        </button>
-                      )}
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-y-6 gap-x-4">
-                      <div className="md:col-span-4">
-                        <span className="block text-xs font-semibold text-[#71717a] uppercase tracking-wide mb-2">Motivo</span>
-                        <p className="text-[#a1a1aa] font-medium">{ban.reason}</p>
-                      </div>
-                      
-                      {ban.appeal_status && (
-                        <div>
-                          <span className="block text-xs font-semibold text-[#71717a] uppercase tracking-wide mb-2">Estado do Apelo</span>
-                          {ban.appeal_status === 'pending' && <span className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold text-[#36c0ff] bg-[#36c0ff]/10 border border-[#36c0ff]/20">Em análise</span>}
-                          {ban.appeal_status === 'accepted' && <span className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20">Aceito</span>}
-                          {ban.appeal_status === 'rejected' && <span className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold text-[#ef4444] bg-[#ef4444]/10 border border-[#ef4444]/20">Rejeitado</span>}
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {bans.map((ban) => {
+                    const config = getStatusConfig(ban);
+                    return (
+                      <article key={ban.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden group">
+                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.bg}`}></div>
+                        
+                        <div className="w-48 pl-4">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10">
+                            Punição / Ban
+                          </span>
                         </div>
-                      )}
-
-                      <div className="hidden md:block md:col-span-2"></div>
-                      
-                      <div>
-                        <span className="block text-xs font-semibold text-[#71717a] uppercase tracking-wide mb-2">Banido Em</span>
-                        <p className="font-mono text-sm">{new Date(ban.banned_at).toLocaleString()}</p>
-                      </div>
-
-                      <div>
-                        <span className="block text-xs font-semibold text-[#71717a] uppercase tracking-wide mb-2">Banido Até</span>
-                        <p className="font-mono text-sm">{ban.banned_until ? new Date(ban.banned_until).toLocaleString() : 'Permanente'}</p>
-                      </div>
-
-                      <div>
-                        <span className="block text-xs font-semibold text-[#71717a] uppercase tracking-wide mb-2">Servidor</span>
-                        <p className="text-sm">{ban.server_name}</p>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })
-            )}
+                        
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-white mb-1">
+                            {ban.reason.length > 50 ? `${ban.reason.substring(0, 50)}...` : ban.reason}
+                          </h3>
+                          <div className="text-xs text-[#71717a] flex items-center gap-3">
+                            <span>Servidor: {ban.server_name}</span>
+                            {ban.status === 'active' && !ban.appeal_status && (
+                              <button 
+                                onClick={() => openAppealModal(ban.id, config.label, ban.reason)}
+                                className="text-[#f59e0b] hover:text-[#facc15] underline decoration-dashed underline-offset-2 transition-colors"
+                              >
+                                Apelar Punição
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="w-32 text-center flex flex-col items-center justify-center gap-1.5">
+                          <span className="text-sm font-bold" style={{ color: config.color }}>{config.label}</span>
+                          {ban.appeal_status === 'pending' && <span className="text-[10px] uppercase font-bold text-[#36c0ff] bg-[#36c0ff]/10 px-2 py-0.5 rounded border border-[#36c0ff]/20">Em Análise</span>}
+                          {ban.appeal_status === 'accepted' && <span className="text-[10px] uppercase font-bold text-[#22c55e] bg-[#22c55e]/10 px-2 py-0.5 rounded border border-[#22c55e]/20">Aceito</span>}
+                          {ban.appeal_status === 'rejected' && <span className="text-[10px] uppercase font-bold text-[#ef4444] bg-[#ef4444]/10 px-2 py-0.5 rounded border border-[#ef4444]/20">Negado</span>}
+                        </div>
+                        
+                        <div className="w-48 text-right pr-2 text-sm text-[#a1a1aa]">
+                          {new Date(ban.banned_at).toLocaleDateString('pt-BR')} <br/>
+                          <span className="text-xs text-[#71717a]">{new Date(ban.banned_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute:'2-digit' })}</span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </main>
         )}
       </div>
