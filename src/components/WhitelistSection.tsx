@@ -8,8 +8,8 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
   const steps = [
     {
       number: '01',
-      title: 'Crie sua Conta',
-      description: 'Registre-se usando sua conta do Discord para sincronizar seus dados.',
+      title: 'Conecta o Discord',
+      description: 'Entra com teu Discord pra gente vincular seu passaporte da cidade.',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -18,8 +18,8 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
     },
     {
       number: '02',
-      title: 'Leia as Regras',
-      description: 'Familiarize-se com todas as regras e diretrizes do servidor.',
+      title: 'Pega a Visão',
+      description: 'Dá uma lida nas regras pra não fazer cagada quando entrar na cidade.',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -28,8 +28,8 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
     },
     {
       number: '03',
-      title: 'Complete o Questionário',
-      description: 'Responda perguntas sobre RP para demonstrar seu conhecimento.',
+      title: 'Faz a Prova',
+      description: 'Umas perguntinhas rápidas só pra ver se você manja dos paranauês do RP.',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -38,8 +38,8 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
     },
     {
       number: '04',
-      title: 'Aguarde Aprovação',
-      description: 'Nossa equipe analisará sua aplicação em até 24 horas.',
+      title: 'Só Aguardar',
+      description: 'A staff vai aprovar seu passaporte rapidão. Fica de olho no Discord!',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -57,10 +57,10 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
             Whitelist
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            Entre para a <span className="gradient-text">Comunidade</span>
+            Bora pra <span className="gradient-text">Cidade?</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Complete o processo de whitelist para acessar o servidor e começar sua jornada em Los Santos.
+            Faz a whitelist aí pra liberar seu passaporte e colar na cidade com a rapaziada.
           </p>
         </div>
 
@@ -95,9 +95,9 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
         {/* Whitelist Form Preview */}
         <div className="glass-card rounded-3xl p-8 md:p-12 max-w-4xl mx-auto glow-violet">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">Pronto para começar?</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">Tá esperando o quê?</h3>
             <p className="text-gray-400">
-              Clique no botão abaixo para iniciar o processo de whitelist
+              Clica aí embaixo e já garante tua vaga na cidade.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-300">Conhecimento básico de RP</p>
+              <p className="text-sm text-gray-300">Saber o básico de RP</p>
             </div>
             <div className="bg-white/5 rounded-xl p-4 text-center">
               <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mx-auto mb-3">

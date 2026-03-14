@@ -34,14 +34,13 @@ const AboutSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20 mb-4">
-            Sobre Nós
+            A Cidade
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            <span className="gradient-text">Bem-vindo ao UNDER RP</span>
+            <span className="gradient-text">Bem-vindo a UNDER RP</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            O servidor de roleplay mais imersivo do Brasil. Uma experiência única que combina
-            realismo, diversão e uma comunidade apaixonada.
+            O servidor de roleplay que mais cresce no Brasil. Aqui o RP é sério, a economia é equilibrada e a diversão é garantida.
           </p>
         </div>
 
@@ -87,8 +86,8 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Infraestrutura Premium</h4>
-                  <p className="text-gray-400">Servidores de alta performance com anti-lag e proteção DDoS avançada.</p>
+                  <h4 className="text-lg font-semibold text-white mb-2">Host BR Premium</h4>
+                  <p className="text-gray-400">FPS cravado e ping liso. Infraestrutura de ponta pra você jogar sem ter dor de cabeça.</p>
                 </div>
               </div>
             </div>
@@ -101,8 +100,8 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Equipe Profissional</h4>
-                  <p className="text-gray-400">Staff treinada e preparada para garantir a melhor experiência de jogo.</p>
+                  <h4 className="text-lg font-semibold text-white mb-2">Staff Presente</h4>
+                  <p className="text-gray-400">Equipe online e pronta pra atender chamado na hora. Aqui a gente valoriza o seu RP justo.</p>
                 </div>
               </div>
             </div>
@@ -115,8 +114,8 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Desenvolvimento Contínuo</h4>
-                  <p className="text-gray-400">Atualizações semanais com novos conteúdos, sistemas e melhorias.</p>
+                  <h4 className="text-lg font-semibold text-white mb-2">Novidades toda semana</h4>
+                  <p className="text-gray-400">A cidade não para! Scripts novos, melhorias e carros inéditos chegando sempre.</p>
                 </div>
               </div>
             </div>

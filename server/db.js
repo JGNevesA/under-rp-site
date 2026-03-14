@@ -62,6 +62,37 @@ export async function initDatabase() {
       // Ignore errors
     }
 
+    // Create bans table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS bans (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        reason TEXT NOT NULL,
+        banned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        banned_until TIMESTAMP NULL,
+        server_name VARCHAR(255) DEFAULT 'FiveM Brazil',
+        status ENUM('active', 'expired', 'revoked') DEFAULT 'active',
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Create appeals table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS appeals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        ban_id INT NOT NULL,
+        user_id INT NOT NULL,
+        appeal_reason TEXT NOT NULL,
+        proof_link VARCHAR(1000),
+        status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (ban_id) REFERENCES bans(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY(ban_id)
+      )
+    `);
+
     console.log('✅ Banco de dados e tabela "users" prontos!');
   } finally {
     connection.release();

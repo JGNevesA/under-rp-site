@@ -251,6 +251,121 @@ app.get('/auth/steam/return',
 );
 
 // =============================================
+// Ban & Appeal Routes
+// =============================================
+
+// Middleware to verify JWT token
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido ou expirado' });
+  }
+};
+
+// GET /api/bans - Get all bans for the logged-in user
+app.get('/api/bans', authenticateToken, async (req, res) => {
+  try {
+    const { discord_id, steam_id } = req.user;
+    
+    // First, find the user's ID in the database
+    let userQuery = '';
+    let userParams = [];
+    
+    if (steam_id) {
+      userQuery = 'SELECT id FROM users WHERE steam_id = ?';
+      userParams = [steam_id];
+    } else if (discord_id) {
+      userQuery = 'SELECT id FROM users WHERE discord_id = ?';
+      userParams = [discord_id];
+    } else {
+      return res.status(400).json({ error: 'Usuário inválido' });
+    }
+    
+    const [users] = await pool.execute(userQuery, userParams);
+    if (users.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
+    
+    const userId = users[0].id;
+    
+    // Fetch bans and their associated appeal status
+    const [bans] = await pool.execute(`
+      SELECT b.*, a.status as appeal_status, a.id as appeal_id
+      FROM bans b
+      LEFT JOIN appeals a ON b.id = a.ban_id
+      WHERE b.user_id = ?
+      ORDER BY b.banned_at DESC
+    `, [userId]);
+    
+    res.json(bans);
+  } catch (error) {
+    console.error('Erro ao buscar bans:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// POST /api/bans/:id/appeal - Create an appeal for a specific ban
+app.post('/api/bans/:id/appeal', authenticateToken, async (req, res) => {
+  try {
+    const banId = req.params.id;
+    const { reason, proof_link } = req.body;
+    const { discord_id, steam_id } = req.user;
+    
+    if (!reason || !proof_link) {
+      return res.status(400).json({ error: 'Motivo e link de provas são obrigatórios' });
+    }
+
+    // Find the user's ID in the database
+    let userQuery = '';
+    let userParams = [];
+    
+    if (steam_id) {
+      userQuery = 'SELECT id FROM users WHERE steam_id = ?';
+      userParams = [steam_id];
+    } else if (discord_id) {
+      userQuery = 'SELECT id FROM users WHERE discord_id = ?';
+      userParams = [discord_id];
+    }
+    
+    const [users] = await pool.execute(userQuery, userParams);
+    if (users.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
+    
+    const userId = users[0].id;
+    
+    // Check if ban exists and belongs to user
+    const [bans] = await pool.execute('SELECT * FROM bans WHERE id = ? AND user_id = ?', [banId, userId]);
+    if (bans.length === 0) {
+      return res.status(404).json({ error: 'Ban não encontrado ou não pertence a você' });
+    }
+    
+    // Create the appeal
+    try {
+      await pool.execute(`
+        INSERT INTO appeals (ban_id, user_id, appeal_reason, proof_link)
+        VALUES (?, ?, ?, ?)
+      `, [banId, userId, reason, proof_link]);
+      
+      res.status(201).json({ success: true, message: 'Apelo enviado com sucesso' });
+    } catch (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ error: 'Você já possui um apelo para este ban' });
+      }
+      throw err;
+    }
+  } catch (error) {
+    console.error('Erro ao criar apelo:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// =============================================
 // Start Server
 // =============================================
 async function start() {

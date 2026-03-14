@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const SupportSection = () => {
   const supportOptions = [
     {
@@ -19,10 +21,10 @@ const SupportSection = () => {
         </svg>
       ),
       title: 'Abrir Ticket',
-      description: 'Crie um ticket para problemas técnicos, denúncias ou dúvidas.',
-      action: 'Novo Ticket',
+      description: 'Crie um ticket para problemas técnicos, denúncias ou apelos de ban.',
+      action: 'Novo Ticket / Apelo',
       iconBg: 'bg-gradient-to-br from-amber-400 to-yellow-600',
-      href: 'https://discord.com/channels/1460473286264750349/1480725431404728350',
+      to: '/bans',
     },
     {
       icon: (
@@ -102,12 +104,14 @@ const SupportSection = () => {
         {/* Support Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {supportOptions.map((option, index) => {
-            const CardWrapper = option.href ? 'a' : 'div';
-            const extraProps = option.href ? { href: option.href, target: '_blank', rel: 'noopener noreferrer' } : {};
+            const CardWrapper = option.href || option.to ? (option.to ? Link : 'a') : 'div';
+            const extraProps = option.href 
+              ? { href: option.href, target: '_blank', rel: 'noopener noreferrer' } 
+              : option.to ? { to: option.to } : {};
             return (
               <CardWrapper
                 key={index}
-                {...extraProps}
+                {...extraProps as any}
                 className="group bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-violet-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/10 hover:-translate-y-1 cursor-pointer block no-underline"
               >
                 {/* Icon */}

@@ -6,9 +6,10 @@ const API_URL = 'https://underrp-api.onrender.com';
 interface NavbarProps {
   user: User | null;
   setUser: (user: User | null) => void;
+  onOpenQueue: () => void;
 }
 
-const Navbar = ({ user, setUser }: NavbarProps) => {
+const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -47,9 +48,10 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3">
-      <div className="max-w-7xl mx-auto">
-        <div className={`rounded-2xl px-6 py-4 flex items-center justify-between transition-all duration-300 ${isScrolled
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-3">
+        <div className="max-w-7xl mx-auto">
+          <div className={`rounded-2xl px-6 py-4 flex items-center justify-between transition-all duration-300 ${isScrolled
           ? 'bg-black/70 backdrop-blur-xl border border-white/10 shadow-lg shadow-violet-500/5'
           : 'bg-white/[0.03] backdrop-blur-xl border border-white/10'
           }`}>
@@ -83,42 +85,50 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               /* Logged in - Show user */
-              <div className="relative">
+              <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200"
+                  onClick={onOpenQueue}
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-black font-bold text-sm rounded-lg transition-colors shadow-lg shadow-orange-500/20 hidden sm:block"
                 >
-                  <img
-                    src={user.avatar}
-                    alt={user.global_name}
-                    className="w-7 h-7 rounded-full"
-                  />
-                  <span className="text-sm font-medium text-white max-w-[100px] truncate">
-                    {user.global_name}
-                  </span>
-                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  Entrar na fila
                 </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200"
+                  >
+                    <img
+                      src={user.avatar}
+                      alt={user.global_name}
+                      className="w-7 h-7 rounded-full"
+                    />
+                    <span className="text-sm font-medium text-white max-w-[100px] truncate">
+                      {user.global_name}
+                    </span>
+                    <svg className={`w-4 h-4 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
 
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden">
-                    <div className="px-4 py-3 border-b border-white/10">
-                      <p className="text-sm font-medium text-white">{user.global_name}</p>
-                      <p className="text-xs text-gray-400">@{user.username}</p>
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden">
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <p className="text-sm font-medium text-white">{user.global_name}</p>
+                        <p className="text-xs text-gray-400">@{user.username}</p>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full px-4 py-3 text-sm text-red-400 hover:bg-white/5 text-left flex items-center gap-2 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sair
+                      </button>
                     </div>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full px-4 py-3 text-sm text-red-400 hover:bg-white/5 text-left flex items-center gap-2 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      Sair
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ) : (
               /* Not logged in - Show login buttons */
@@ -177,7 +187,17 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
               <div className="flex flex-col gap-2 mt-4 px-4">
                 {user ? (
                   /* Mobile - Logged in */
-                  <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => {
+                        onOpenQueue();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-black font-bold text-sm rounded-lg transition-colors shadow-lg shadow-orange-500/20 text-center"
+                    >
+                      Entrar na fila
+                    </button>
+                    <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3 border border-white/10">
                     <div className="flex items-center gap-3">
                       <img
                         src={user.avatar}
@@ -196,6 +216,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
                       Sair
                     </button>
                   </div>
+                </div>
                 ) : (
                   /* Mobile - Not logged in */
                   <div className="flex flex-col gap-2">
@@ -225,6 +246,7 @@ const Navbar = ({ user, setUser }: NavbarProps) => {
         )}
       </div>
     </nav>
+    </>
   );
 };
 

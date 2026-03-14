@@ -258,10 +258,26 @@ const DonationSection = () => {
                 />
 
                 {/* Card interno */}
-                <div className="relative bg-[#0c1322]/95 backdrop-blur-xl rounded-2xl p-5 flex flex-col h-full overflow-hidden">
+                <div className={`relative bg-[#0c1322]/95 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden shiny-card ${item.isPopular ? 'popular' : ''}`}>
+                  
+                  {/* Shines & Tiles Background */}
+                  <div className="shine" />
+                  <div className="background">
+                    <div className="tiles">
+                      {[...Array(10)].map((_, i) => (
+                        <div key={i} className={`tile tile-${i + 1}`} />
+                      ))}
+                    </div>
+                    <div className="line line-1" />
+                    <div className="line line-2" />
+                    <div className="line line-3" />
+                  </div>
 
-                  {/* Linha de brilho no topo */}
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+                  {/* Card Content wrapper to sit above background */}
+                  <div className="relative z-10 flex flex-col h-full p-5">
+
+                    {/* Linha de brilho no topo */}
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
                   {/* === IMAGEM (mantida intacta) ou ÍCONE === */}
                   {item.image ? (
@@ -345,6 +361,7 @@ const DonationSection = () => {
                       {item.buttonText || '💜 Doar'}
                     </span>
                   </a>
+                  </div>
                 </div>
               </div>
             ))}

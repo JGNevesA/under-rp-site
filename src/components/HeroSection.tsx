@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  onOpenQueue: () => void;
+}
+
+const HeroSection = ({ onOpenQueue }: HeroSectionProps) => {
   const [stats, setStats] = useState({
     players: 246,
     ping: 15,
@@ -48,8 +52,8 @@ const HeroSection = () => {
 
         {/* Subtitle */}
         <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-          A experiência definitiva de GTA V Roleplay.{' '}
-          <span className="text-violet-400">Imersão total</span> em Los Santos.
+          Sua nova vida começa aqui. Faça sua história no maior e mais completo 
+          <span className="text-violet-400"> Roleplay de Los Santos</span>.
         </p>
 
         {/* Server Stats Widget */}
@@ -61,7 +65,7 @@ const HeroSection = () => {
                 <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <span className="text-gray-400 text-sm">Jogadores Online</span>
+                <span className="text-gray-400 text-sm">Cidadãos na Cidade</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.players}</p>
             </div>
@@ -96,15 +100,15 @@ const HeroSection = () => {
 
         {/* CTA Button */}
         <div className="flex items-center justify-center mb-16">
-          <a
-            href="#whitelist"
-            className="group px-8 py-4 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-black font-bold text-lg rounded-xl transition-all duration-300 hover:scale-105 shadow-xl shadow-amber-500/20 flex items-center gap-2"
+          <button
+            onClick={onOpenQueue}
+            className="group px-8 py-4 bg-orange-500 hover:bg-orange-600 text-black font-bold text-lg rounded-xl transition-all duration-300 hover:scale-105 shadow-xl shadow-orange-500/20 flex items-center gap-2"
           >
-            Jogar Agora
+            Entrar na Fila
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </button>
         </div>
 
         {/* Scroll Indicator */}

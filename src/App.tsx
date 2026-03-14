@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
@@ -7,6 +8,8 @@ import DonationSection from './components/DonationSection';
 import WhitelistSection from './components/WhitelistSection';
 import SupportSection from './components/SupportSection';
 import Footer from './components/Footer';
+import QueueModal from './components/QueueModal';
+import BanHistory from './components/BanHistory';
 
 export interface User {
   id?: string;
@@ -18,10 +21,11 @@ export interface User {
   source: 'discord' | 'steam';
 }
 
-const API_URL = 'https://underrp-api.onrender.com';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -65,17 +69,25 @@ function App() {
 
       {/* Content */}
       <div className="relative z-10">
-        <Navbar user={user} setUser={setUser} />
+        <Navbar user={user} setUser={setUser} onOpenQueue={() => setIsQueueOpen(true)} />
         <main>
-          <HeroSection />
-          <AboutSection />
-          <RulesSection />
-          <DonationSection />
-          <WhitelistSection user={user} />
-          <SupportSection />
+          <Routes>
+            <Route path="/" element={
+              <>
+                <HeroSection onOpenQueue={() => setIsQueueOpen(true)} />
+                <AboutSection />
+                <RulesSection />
+                <DonationSection />
+                <WhitelistSection user={user} />
+                <SupportSection />
+              </>
+            } />
+            <Route path="/bans" element={<BanHistory />} />
+          </Routes>
         </main>
         <Footer />
       </div>
+      {isQueueOpen && <QueueModal onClose={() => setIsQueueOpen(false)} />}
     </div>
   );
 }

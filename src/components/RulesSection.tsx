@@ -7,11 +7,11 @@ const RulesSection = () => {
         </svg>
       ),
       title: 'Anti-RP',
-      description: 'Condutas proibidas',
+      description: 'O que dá ban na hora',
       rules: [
-        'VDM (Vehicle Deathmatch) é proibido',
-        'RDM (Random Deathmatch) não tolerado',
-        'Metagaming resulta em ban',
+        'Comprar briga sem motivo (RDM)',
+        'Atropelar as pessoas à toa (VDM)',
+        'Misturar vida real com o jogo (Meta)',
         'Powergaming é passível de punição',
         'Combat Logging = Ban temporário',
       ],
@@ -23,11 +23,11 @@ const RulesSection = () => {
         </svg>
       ),
       title: 'Comunicação',
-      description: 'Regras de interação',
+      description: 'Como trocar ideia',
       rules: [
-        'Respeito mútuo obrigatório',
-        'Proibido spam no chat',
-        'Use o chat correto para cada situação',
+        'Respeito com todo mundo na cidade',
+        'Não foca no OOC no meio do RP',
+        'Saiba a hora de mandar mensagem',
         'Português obrigatório no servidor',
         'Evite informações OOC no IC',
       ],
@@ -38,12 +38,12 @@ const RulesSection = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
       ),
-      title: 'Suporte Staff',
-      description: 'Auxílio e reporte',
+      title: 'Precisando de Ajuda',
+      description: 'Como chamar os Deuses',
       rules: [
-        'Use /report para bugs',
-        'Tickets via Discord oficial',
-        'Não abuse do sistema de report',
+        'Use o mental mentalize a Staff',
+        'Dúvidas pesadas? Chama no Ticket',
+        'Não fica chorando no /report atoa',
         'Aguarde resposta com paciência',
         'Forneça provas quando necessário',
       ],
@@ -56,14 +56,13 @@ const RulesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-4">
-            Regras do Servidor
+            Regras da Cidade
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            Nossas <span className="gold-text">Diretrizes</span>
+            A <span className="gold-text">Visão</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Para garantir a melhor experiência de roleplay, seguimos regras claras e justas.
-            Leia atentamente antes de jogar.
+            Pra cidade fluir legal e todo mundo se divertir fazendo aquele RP brabo, tem que andar na linha. Dá uma lida aqui antes de tomar punição de bobeira.
           </p>
         </div>
 
@@ -105,10 +104,9 @@ const RulesSection = () => {
               </svg>
             </div>
             <div className="flex-1">
-              <h4 className="text-lg font-semibold text-white mb-1">Aviso Importante</h4>
+              <h4 className="text-lg font-semibold text-white mb-1">Aviso da Staff</h4>
               <p className="text-gray-400">
-                O descumprimento das regras pode resultar em punições que variam de advertências até banimento permanente.
-                Em caso de dúvidas, consulte nossa equipe no Discord.
+                Se pisar na bola ou cometer Anti-RP, vai de ralo (kick ou ban). Tem dúvida de algo que pode ou não fazer? Abre um ticket no Discord antes de fazer besteira in-game.
               </p>
             </div>
             <a
