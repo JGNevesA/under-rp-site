@@ -21,6 +21,17 @@ interface Ticket {
   created_at: string;
 }
 
+interface TicketMessage {
+  id: number;
+  ticket_id: number;
+  user_id: number;
+  message: string;
+  is_staff: boolean;
+  created_at: string;
+  username: string;
+  avatar: string;
+}
+
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
 
 const BanHistory = () => {
@@ -74,6 +85,67 @@ const BanHistory = () => {
       alert(err.message);
     } finally {
       setTicketSubmitting(false);
+    }
+  };
+
+  // ---- Ticket Chat View ----
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [ticketMessages, setTicketMessages] = useState<TicketMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const openTicketChat = async (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+    setLoadingMessages(true);
+    try {
+      const res = await fetch(`${API_URL}/api/tickets/${ticket.id}/messages`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTicketMessages(data.messages);
+        // Update ticket status from server
+        setSelectedTicket(data.ticket);
+      }
+    } catch {
+      console.error('Erro ao buscar mensagens');
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const closeTicketChat = () => {
+    setSelectedTicket(null);
+    setTicketMessages([]);
+    setNewMessage('');
+  };
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedTicket) return;
+    setSendingMessage(true);
+    try {
+      const res = await fetch(`${API_URL}/api/tickets/${selectedTicket.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ message: newMessage })
+      });
+      if (res.ok) {
+        // Refetch messages
+        const msgRes = await fetch(`${API_URL}/api/tickets/${selectedTicket.id}/messages`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (msgRes.ok) {
+          const data = await msgRes.json();
+          setTicketMessages(data.messages);
+        }
+        setNewMessage('');
+      }
+    } catch {
+      alert('Erro ao enviar mensagem');
+    } finally {
+      setSendingMessage(false);
     }
   };
   
@@ -220,58 +292,181 @@ const BanHistory = () => {
         {token && !isLoading && (
           <main className="flex flex-col gap-8">
             <div className="bg-[#1c1c1e] border border-white/5 rounded-xl p-8 shadow-2xl">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide">
-                  TICKETS DE SUPORTE
-                </h2>
-                <button onClick={openNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black px-5 py-2 rounded-md text-sm font-bold transition-all shadow-[0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_18px_rgba(250,204,21,0.35)]">
-                  + Novo
-                </button>
-              </div>
-              
-              <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
-                <div className="w-48 pl-2">Categoria</div>
-                <div className="flex-1">Titulo</div>
-                <div className="w-32 text-center">Estado</div>
-                <div className="w-48 text-right pr-2">Ultima Atualização</div>
-              </div>
-              
-              {tickets.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-[#52525b] font-medium text-sm">Nenhum Chamado de Suporte</p>
+
+              {/* === TICKET CHAT VIEW === */}
+              {selectedTicket ? (
+                <div className="flex flex-col">
+                  {/* Header */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide mb-1">
+                        TICKET DE SUPORTE
+                      </h2>
+                      <p className="text-xs text-[#71717a] mt-1">Título</p>
+                      <p className="text-white font-semibold">{selectedTicket.title}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-xs text-[#71717a]">Criado em</p>
+                        <p className="text-sm text-[#a1a1aa]">
+                          {new Date(selectedTicket.created_at).toLocaleDateString('pt-BR')} às {new Date(selectedTicket.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-[#71717a]">Estado</p>
+                        <span className={`text-sm font-bold px-3 py-1 rounded border ${
+                          selectedTicket.status === 'open' ? 'text-[#facc15] border-[#facc15]/30 bg-[#facc15]/10' :
+                          selectedTicket.status === 'in_progress' ? 'text-[#36c0ff] border-[#36c0ff]/30 bg-[#36c0ff]/10' :
+                          'text-[#71717a] border-[#71717a]/30 bg-[#71717a]/10'
+                        }`}>
+                          {selectedTicket.status === 'open' ? 'Aberto' : selectedTicket.status === 'in_progress' ? 'Em Andamento' : 'Fechado'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={closeTicketChat}
+                        className="bg-white/5 hover:bg-white/10 text-white px-5 py-2 rounded-md text-sm font-bold transition-all border border-white/10"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="bg-[#18181b] border border-white/5 rounded-lg p-5 mb-6">
+                    <p className="text-xs text-[#71717a] uppercase tracking-wider font-bold mb-2">Descrição do Chamado</p>
+                    <p className="text-[#a1a1aa] text-sm whitespace-pre-wrap">{selectedTicket.description}</p>
+                  </div>
+
+                  {/* Messages */}
+                  <div className="flex flex-col gap-4 mb-6 min-h-[200px]">
+                    {loadingMessages ? (
+                      <div className="text-center py-10 text-[#a1a1aa] animate-pulse">Carregando mensagens...</div>
+                    ) : ticketMessages.length === 0 ? (
+                      <div className="text-center py-10">
+                        <p className="text-[#52525b] text-sm">Nenhuma mensagem ainda. Envie a primeira mensagem abaixo.</p>
+                      </div>
+                    ) : (
+                      ticketMessages.map((msg) => (
+                        <div key={msg.id} className="bg-[#18181b] border border-white/5 rounded-lg p-5">
+                          <div className="flex items-center gap-3 mb-3">
+                            <img
+                              src={msg.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                              alt={msg.username}
+                              className="w-9 h-9 rounded-full"
+                            />
+                            <div>
+                              <span className={`font-bold text-sm ${msg.is_staff ? 'text-[#facc15]' : 'text-[#a1a1aa]'}`}>
+                                {msg.is_staff ? '⭐ UnderRP Suporte' : msg.username}
+                              </span>
+                              <p className="text-xs text-[#52525b]">
+                                {new Date(msg.created_at).toLocaleDateString('pt-BR')} às {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className={`ml-12 p-4 rounded-lg text-sm whitespace-pre-wrap ${
+                            msg.is_staff
+                              ? 'bg-[#facc15]/5 border border-[#facc15]/10 text-[#d4d4d8]'
+                              : 'bg-white/5 border border-white/5 text-[#a1a1aa]'
+                          }`}>
+                            {msg.message}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Reply box */}
+                  {selectedTicket.status !== 'closed' ? (
+                    <form onSubmit={sendMessage} className="flex gap-3">
+                      <textarea
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Digite sua mensagem..."
+                        required
+                        rows={3}
+                        className="flex-1 bg-[#18181b] border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-[#52525b] focus:outline-none focus:border-[#f59e0b]/50 resize-none"
+                      />
+                      <button
+                        type="submit"
+                        disabled={sendingMessage || !newMessage.trim()}
+                        className="self-end bg-[#f59e0b] hover:bg-[#facc15] disabled:opacity-40 text-black px-6 py-3 rounded-lg text-sm font-bold transition-all"
+                      >
+                        {sendingMessage ? 'Enviando...' : 'Enviar'}
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="text-center py-4 bg-[#18181b] border border-white/5 rounded-lg">
+                      <p className="text-[#71717a] text-sm">Este ticket está fechado. Se precisar de mais ajuda, abra um novo ticket.</p>
+                    </div>
+                  )}
                 </div>
+
               ) : (
-                <div className="flex flex-col gap-3">
-                  {tickets.map((ticket) => {
-                    const statusMap: Record<string, { label: string; color: string; bg: string }> = {
-                      open: { label: 'Aberto', color: '#facc15', bg: 'bg-[#facc15]' },
-                      in_progress: { label: 'Em Andamento', color: '#36c0ff', bg: 'bg-[#36c0ff]' },
-                      closed: { label: 'Fechado', color: '#71717a', bg: 'bg-[#71717a]' },
-                    };
-                    const ts = statusMap[ticket.status] || statusMap.open;
-                    return (
-                      <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
-                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
-                        <div className="w-48 pl-4">
-                          <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10">
-                            {ticket.category.length > 14 ? ticket.category.substring(0, 14) + '…' : ticket.category}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-white mb-1">{ticket.title.length > 60 ? `${ticket.title.substring(0, 60)}...` : ticket.title}</h3>
-                          <p className="text-xs text-[#71717a]">UnderRP</p>
-                        </div>
-                        <div className="w-32 text-center">
-                          <span className="text-sm font-bold" style={{ color: ts.color }}>{ts.label}</span>
-                        </div>
-                        <div className="w-48 text-right pr-2 text-sm text-[#a1a1aa]">
-                          {new Date(ticket.created_at).toLocaleDateString('pt-BR')}<br/>
-                          <span className="text-xs text-[#71717a]">{new Date(ticket.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
+                /* === TICKET LIST VIEW === */
+                <>
+                  <div className="flex justify-between items-center mb-8">
+                    <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide">
+                      TICKETS DE SUPORTE
+                    </h2>
+                    <button onClick={openNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black px-5 py-2 rounded-md text-sm font-bold transition-all shadow-[0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_18px_rgba(250,204,21,0.35)]">
+                      + Novo
+                    </button>
+                  </div>
+                  
+                  <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
+                    <div className="w-36 pl-2">Categoria</div>
+                    <div className="flex-1">Titulo</div>
+                    <div className="w-28 text-center">Estado</div>
+                    <div className="w-40 text-right">Ultima Atualização</div>
+                    <div className="w-28 text-center">Ação</div>
+                  </div>
+                  
+                  {tickets.length === 0 ? (
+                    <div className="text-center py-10">
+                      <p className="text-[#52525b] font-medium text-sm">Nenhum Chamado de Suporte</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      {tickets.map((ticket) => {
+                        const statusMap: Record<string, { label: string; color: string; bg: string }> = {
+                          open: { label: 'Aberto', color: '#facc15', bg: 'bg-[#facc15]' },
+                          in_progress: { label: 'Em Andamento', color: '#36c0ff', bg: 'bg-[#36c0ff]' },
+                          closed: { label: 'Fechado', color: '#71717a', bg: 'bg-[#71717a]' },
+                        };
+                        const ts = statusMap[ticket.status] || statusMap.open;
+                        return (
+                          <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
+                            <div className="w-36 pl-4">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10">
+                                {ticket.category.length > 14 ? ticket.category.substring(0, 14) + '…' : ticket.category}
+                              </span>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-white mb-1">{ticket.title.length > 50 ? `${ticket.title.substring(0, 50)}...` : ticket.title}</h3>
+                              <p className="text-xs text-[#71717a]">UnderRP</p>
+                            </div>
+                            <div className="w-28 text-center">
+                              <span className="text-sm font-bold" style={{ color: ts.color }}>{ts.label}</span>
+                            </div>
+                            <div className="w-40 text-right text-sm text-[#a1a1aa]">
+                              {new Date(ticket.created_at).toLocaleDateString('pt-BR')}<br/>
+                              <span className="text-xs text-[#71717a]">{new Date(ticket.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="w-28 text-center">
+                              <button
+                                onClick={() => openTicketChat(ticket)}
+                                className="bg-white/5 hover:bg-white/10 text-white px-4 py-1.5 rounded text-xs font-bold transition-all border border-white/10"
+                              >
+                                Visualizar
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
