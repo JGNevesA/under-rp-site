@@ -392,7 +392,7 @@ const BanHistory = () => {
               ) : (
                 <form onSubmit={submitNewTicket} className="flex flex-col gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Título do chamado</label>
+                    <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Título do ticket</label>
                     <input
                       type="text"
                       required
