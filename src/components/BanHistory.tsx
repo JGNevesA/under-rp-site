@@ -364,7 +364,7 @@ const BanHistory = () => {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="font-poppins text-xl font-extrabold text-[#facc15] uppercase tracking-widest">
-                    Abrir Chamado
+                    Novo Ticket
                   </h2>
                   <p className="text-xs text-[#52525b] mt-0.5">Preencha os campos abaixo. Nossa equipe responderá em breve.</p>
                 </div>
@@ -383,7 +383,7 @@ const BanHistory = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-2">Chamado enviado!</h3>
+                  <h3 className="text-white font-bold text-lg mb-2">Ticket enviado!</h3>
                   <p className="text-[#71717a] text-sm mb-6">Nossa equipe vai analisar e responder em breve.<br/>Fique de olho no painel de tickets.</p>
                   <button onClick={closeNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
                     Fechar
