@@ -18,6 +18,35 @@ const BanHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appealTarget, setAppealTarget] = useState<{ banId: number; targetName: string; reason: string }>({ banId: 0, targetName: '', reason: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
+  const [newTicket, setNewTicket] = useState({ title: '', server: '', category: '', description: '' });
+  const [ticketSubmitting, setTicketSubmitting] = useState(false);
+  const [ticketSuccess, setTicketSuccess] = useState(false);
+
+  const SERVERS = ['UnderRP Principal', 'UnderRP Arena'];
+  const CATEGORIES = ['Dúvidas Gerais', 'Apelo de Punição', 'Problema com Compra', 'Report de Jogador', 'Report de Staff', 'Bug / Erro no Servidor', 'Sugestão', 'Outro'];
+
+  const openNewTicket = () => {
+    setNewTicket({ title: '', server: '', category: '', description: '' });
+    setTicketSuccess(false);
+    setIsNewTicketOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeNewTicket = () => {
+    setIsNewTicketOpen(false);
+    document.body.style.overflow = '';
+  };
+
+  const submitNewTicket = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTicketSubmitting(true);
+    // Simulate API call
+    await new Promise(r => setTimeout(r, 1500));
+    setTicketSubmitting(false);
+    setTicketSuccess(true);
+  };
   
   const [bans, setBans] = useState<Ban[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -174,8 +203,8 @@ const BanHistory = () => {
                 <h2 className="font-poppins text-2xl font-bold text-[#84cc16] uppercase tracking-wide">
                   TICKETS DE SUPORTE
                 </h2>
-                <button className="bg-transparent border border-white/20 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-white/5 transition-colors">
-                  Novo
+                <button onClick={openNewTicket} className="bg-[#84cc16] hover:bg-[#65a30d] text-black px-5 py-2 rounded-md text-sm font-bold transition-colors shadow-[0_0_12px_rgba(132,204,22,0.2)]">
+                  + Novo
                 </button>
               </div>
               
@@ -319,6 +348,124 @@ const BanHistory = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL NOVO TICKET */}
+      {isNewTicketOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-5"
+          onClick={closeNewTicket}
+        >
+          <div
+            className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-xl relative shadow-[0_0_60px_rgba(132,204,22,0.08)] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Glow accent top */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#84cc16]/60 to-transparent" />
+            
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="font-poppins text-xl font-extrabold text-[#84cc16] uppercase tracking-widest">
+                    Abrir Chamado
+                  </h2>
+                  <p className="text-xs text-[#52525b] mt-0.5">Preencha os campos abaixo. Nossa equipe responderá em breve.</p>
+                </div>
+                <button
+                  onClick={closeNewTicket}
+                  className="text-[#52525b] hover:text-white text-2xl font-light leading-none transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {ticketSuccess ? (
+                <div className="text-center py-10">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#84cc16]/10 border border-[#84cc16]/30 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-[#84cc16]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-2">Chamado enviado!</h3>
+                  <p className="text-[#71717a] text-sm mb-6">Nossa equipe vai analisar e responder em breve.<br/>Fique de olho no painel de tickets.</p>
+                  <button onClick={closeNewTicket} className="bg-[#84cc16] hover:bg-[#65a30d] text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
+                    Fechar
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={submitNewTicket} className="flex flex-col gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Título do chamado</label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={100}
+                      value={newTicket.title}
+                      onChange={e => setNewTicket({ ...newTicket, title: e.target.value })}
+                      placeholder="Ex: Não consigo acessar o servidor..."
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Servidor</label>
+                      <select
+                        required
+                        value={newTicket.server}
+                        onChange={e => setNewTicket({ ...newTicket, server: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled className="bg-[#111113]">Selecione...</option>
+                        {SERVERS.map(s => <option key={s} value={s} className="bg-[#111113]">{s}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Categoria</label>
+                      <select
+                        required
+                        value={newTicket.category}
+                        onChange={e => setNewTicket({ ...newTicket, category: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled className="bg-[#111113]">Selecione...</option>
+                        {CATEGORIES.map(c => <option key={c} value={c} className="bg-[#111113]">{c}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Descrição detalhada</label>
+                    <textarea
+                      required
+                      rows={4}
+                      value={newTicket.description}
+                      onChange={e => setNewTicket({ ...newTicket, description: e.target.value })}
+                      placeholder="Descreva o problema com o máximo de detalhes possível. Inclua horário, jogadores envolvidos, etc."
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all resize-none"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2 border-t border-white/5 mt-2">
+                    <button
+                      type="button"
+                      onClick={closeNewTicket}
+                      className="px-5 py-2.5 text-sm text-[#a1a1aa] hover:text-white font-semibold hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={ticketSubmitting}
+                      className="bg-[#84cc16] hover:bg-[#65a30d] disabled:opacity-60 text-black font-bold px-6 py-2.5 rounded-lg transition-all text-sm shadow-[0_0_16px_rgba(132,204,22,0.25)] hover:shadow-[0_0_24px_rgba(132,204,22,0.4)]"
+                    >
+                      {ticketSubmitting ? 'Enviando...' : 'Abrir Chamado →'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}
