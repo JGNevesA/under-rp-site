@@ -12,6 +12,15 @@ interface Ban {
   server_name: string;
 }
 
+interface Ticket {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  status: 'open' | 'in_progress' | 'closed';
+  created_at: string;
+}
+
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
 
 const BanHistory = () => {
@@ -20,15 +29,15 @@ const BanHistory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
-  const [newTicket, setNewTicket] = useState({ title: '', server: '', category: '', description: '' });
+  const [newTicket, setNewTicket] = useState({ title: '', category: '', description: '' });
   const [ticketSubmitting, setTicketSubmitting] = useState(false);
   const [ticketSuccess, setTicketSuccess] = useState(false);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const SERVERS = ['UnderRP'];
   const CATEGORIES = ['Dúvidas Gerais', 'Apelo de Punição', 'Problema com Compra', 'Report de Jogador', 'Report de Staff', 'Bug / Erro no Servidor', 'Sugestão', 'Outro'];
 
   const openNewTicket = () => {
-    setNewTicket({ title: '', server: '', category: '', description: '' });
+    setNewTicket({ title: '', category: '', description: '' });
     setTicketSuccess(false);
     setIsNewTicketOpen(true);
     document.body.style.overflow = 'hidden';
@@ -42,10 +51,30 @@ const BanHistory = () => {
   const submitNewTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     setTicketSubmitting(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500));
-    setTicketSubmitting(false);
-    setTicketSuccess(true);
+    try {
+      const response = await fetch(`${API_URL}/api/tickets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(newTicket)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erro ao criar ticket');
+      // Add the new ticket to local state immediately
+      const created: Ticket = {
+        id: data.ticketId,
+        title: newTicket.title,
+        category: newTicket.category,
+        description: newTicket.description,
+        status: 'open',
+        created_at: new Date().toISOString()
+      };
+      setTickets(prev => [created, ...prev]);
+      setTicketSuccess(true);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setTicketSubmitting(false);
+    }
   };
   
   const [bans, setBans] = useState<Ban[]>([]);
@@ -61,18 +90,14 @@ const BanHistory = () => {
       return;
     }
 
-    const fetchBans = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/bans`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Erro ao buscar bans. Verifique seu login.');
-        }
-        
-        const data = await response.json();
-        setBans(data);
+        const [bansRes, ticketsRes] = await Promise.all([
+          fetch(`${API_URL}/api/bans`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/api/tickets`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        if (bansRes.ok) setBans(await bansRes.json());
+        if (ticketsRes.ok) setTickets(await ticketsRes.json());
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -80,7 +105,7 @@ const BanHistory = () => {
       }
     };
 
-    fetchBans();
+    fetchData();
   }, [token]);
 
   const openAppealModal = (banId: number, targetName: string, reason: string) => {
@@ -211,13 +236,51 @@ const BanHistory = () => {
                 <div className="w-48 text-right pr-2">Ultima Atualização</div>
               </div>
               
-              {bans.length === 0 ? (
+              {tickets.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-[#52525b] font-medium text-sm">Nenhum Chamado de Suporte</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
-                  {bans.map((ban) => {
+                  {tickets.map((ticket) => {
+                    const statusMap: Record<string, { label: string; color: string; bg: string }> = {
+                      open: { label: 'Aberto', color: '#facc15', bg: 'bg-[#facc15]' },
+                      in_progress: { label: 'Em Andamento', color: '#36c0ff', bg: 'bg-[#36c0ff]' },
+                      closed: { label: 'Fechado', color: '#71717a', bg: 'bg-[#71717a]' },
+                    };
+                    const ts = statusMap[ticket.status] || statusMap.open;
+                    return (
+                      <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
+                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
+                        <div className="w-48 pl-4">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10">
+                            {ticket.category.length > 14 ? ticket.category.substring(0, 14) + '…' : ticket.category}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-white mb-1">{ticket.title.length > 60 ? `${ticket.title.substring(0, 60)}...` : ticket.title}</h3>
+                          <p className="text-xs text-[#71717a]">UnderRP</p>
+                        </div>
+                        <div className="w-32 text-center">
+                          <span className="text-sm font-bold" style={{ color: ts.color }}>{ts.label}</span>
+                        </div>
+                        <div className="w-48 text-right pr-2 text-sm text-[#a1a1aa]">
+                          {new Date(ticket.created_at).toLocaleDateString('pt-BR')}<br/>
+                          <span className="text-xs text-[#71717a]">{new Date(ticket.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Ban history section */}
+            {bans.length > 0 && (
+              <div>
+                <h3 className="font-poppins text-lg font-bold text-[#facc15] uppercase tracking-wide mb-3 px-1">Histórico de Punições</h3>
+                <div className="flex flex-col gap-3">
+                {bans.map((ban) => {
                     const config = getStatusConfig(ban);
                     return (
                       <article key={ban.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden group">
@@ -261,8 +324,8 @@ const BanHistory = () => {
                     );
                   })}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </main>
         )}
       </div>
@@ -404,31 +467,17 @@ const BanHistory = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Servidor</label>
-                      <select
-                        required
-                        value={newTicket.server}
-                        onChange={e => setNewTicket({ ...newTicket, server: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="" disabled className="bg-[#111113]">Selecione...</option>
-                        {SERVERS.map(s => <option key={s} value={s} className="bg-[#111113]">{s}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Categoria</label>
-                      <select
-                        required
-                        value={newTicket.category}
-                        onChange={e => setNewTicket({ ...newTicket, category: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="" disabled className="bg-[#111113]">Selecione...</option>
-                        {CATEGORIES.map(c => <option key={c} value={c} className="bg-[#111113]">{c}</option>)}
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#71717a] uppercase tracking-wider mb-1.5">Categoria</label>
+                    <select
+                      required
+                      value={newTicket.category}
+                      onChange={e => setNewTicket({ ...newTicket, category: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled className="bg-[#111113]">Selecione uma categoria...</option>
+                      {CATEGORIES.map((c: string) => <option key={c} value={c} className="bg-[#111113]">{c}</option>)}
+                    </select>
                   </div>
 
                   <div>

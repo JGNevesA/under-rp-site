@@ -366,6 +366,58 @@ app.post('/api/bans/:id/appeal', authenticateToken, async (req, res) => {
 });
 
 // =============================================
+// Ticket Routes
+// =============================================
+
+// Helper to get user DB id from JWT token
+async function getUserId(req, res) {
+  const { discord_id, steam_id } = req.user;
+  let userQuery = '', userParams = [];
+  if (steam_id) { userQuery = 'SELECT id FROM users WHERE steam_id = ?'; userParams = [steam_id]; }
+  else if (discord_id) { userQuery = 'SELECT id FROM users WHERE discord_id = ?'; userParams = [discord_id]; }
+  else { res.status(400).json({ error: 'Usuário inválido' }); return null; }
+  const [users] = await pool.execute(userQuery, userParams);
+  if (users.length === 0) { res.status(404).json({ error: 'Usuário não encontrado' }); return null; }
+  return users[0].id;
+}
+
+// GET /api/tickets - Get all tickets for the logged-in user
+app.get('/api/tickets', authenticateToken, async (req, res) => {
+  try {
+    const userId = await getUserId(req, res);
+    if (!userId) return;
+    const [tickets] = await pool.execute(
+      'SELECT * FROM tickets WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+    res.json(tickets);
+  } catch (error) {
+    console.error('Erro ao buscar tickets:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// POST /api/tickets - Create a new ticket
+app.post('/api/tickets', authenticateToken, async (req, res) => {
+  try {
+    const { title, category, description } = req.body;
+    if (!title || !category || !description) {
+      return res.status(400).json({ error: 'Preencha todos os campos obrigatórios' });
+    }
+    const userId = await getUserId(req, res);
+    if (!userId) return;
+    const [result] = await pool.execute(
+      'INSERT INTO tickets (user_id, title, category, description) VALUES (?, ?, ?, ?)',
+      [userId, title, category, description]
+    );
+    res.status(201).json({ success: true, ticketId: result.insertId });
+  } catch (error) {
+    console.error('Erro ao criar ticket:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// =============================================
 // Start Server
 // =============================================
 async function start() {
