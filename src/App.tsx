@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
@@ -22,6 +22,14 @@ export interface User {
 }
 
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -57,6 +65,7 @@ function App() {
       console.error('Erro ao buscar usuário');
     }
   };
+
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       {/* Background Grid Pattern */}
@@ -69,6 +78,7 @@ function App() {
 
       {/* Content */}
       <div className="relative z-10">
+        <ScrollToTop />
         <Navbar user={user} setUser={setUser} onOpenQueue={() => setIsQueueOpen(true)} />
         <main>
           <Routes>
