@@ -39,12 +39,12 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
   };
 
   const navItems = [
-    { name: 'Início', href: '#inicio' },
-    { name: 'Sobre', href: '#sobre' },
-    { name: 'Regras', href: '#regras' },
-    { name: 'Doações', href: '#doacoes' },
-    { name: 'Suporte', href: '#suporte' },
-    { name: 'Whitelist', href: '#whitelist' },
+    { name: 'Início', href: '/#inicio' },
+    { name: 'Sobre', href: '/#sobre' },
+    { name: 'Regras', href: '/#regras' },
+    { name: 'Doações', href: '/#doacoes' },
+    { name: 'Suporte', href: '/#suporte' },
+    { name: 'Whitelist', href: '/#whitelist' },
   ];
 
   return (
@@ -56,7 +56,7 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
           : 'bg-white/[0.03] backdrop-blur-xl border border-white/10'
           }`}>
           {/* Logo with Gamepad Icon */}
-          <a href="#inicio" className="flex items-center gap-3 group">
+          <a href="/#inicio" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center">
               <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M12 12h.01M18.364 5.636a9 9 0 010 12.728M6.343 6.343a8 8 0 000 11.314" />
