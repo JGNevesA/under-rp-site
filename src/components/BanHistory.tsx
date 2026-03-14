@@ -51,6 +51,7 @@ const BanHistory = () => {
   const [bans, setBans] = useState<Ban[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  void error; // suppressed - error hidden from UI intentionally
   
   const token = localStorage.getItem('auth_token');
 
@@ -165,8 +166,8 @@ const BanHistory = () => {
             <h1 
               className="font-poppins text-4xl md:text-5xl font-extrabold uppercase tracking-tight"
               style={{ 
-                color: '#4ade80', 
-                textShadow: '0 0 30px rgba(74, 222, 128, 0.2)' 
+                color: '#facc15', 
+                textShadow: '0 0 30px rgba(250, 204, 21, 0.25)' 
               }}
             >
               VOCÊ ESTÁ BANIDO :(
@@ -189,21 +190,16 @@ const BanHistory = () => {
           </div>
         )}
 
-        {token && error && (
-          <div className="text-center bg-red-500/10 border border-red-500/20 text-red-400 p-8 rounded-2xl">
-            Ops! {error}
-          </div>
-        )}
 
         {/* Bans List / Tickets Panel */}
         {token && !isLoading && (
           <main className="flex flex-col gap-8">
             <div className="bg-[#1c1c1e] border border-white/5 rounded-xl p-8 shadow-2xl">
               <div className="flex justify-between items-center mb-8">
-                <h2 className="font-poppins text-2xl font-bold text-[#84cc16] uppercase tracking-wide">
+                <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide">
                   TICKETS DE SUPORTE
                 </h2>
-                <button onClick={openNewTicket} className="bg-[#84cc16] hover:bg-[#65a30d] text-black px-5 py-2 rounded-md text-sm font-bold transition-colors shadow-[0_0_12px_rgba(132,204,22,0.2)]">
+                <button onClick={openNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black px-5 py-2 rounded-md text-sm font-bold transition-all shadow-[0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_18px_rgba(250,204,21,0.35)]">
                   + Novo
                 </button>
               </div>
@@ -358,16 +354,16 @@ const BanHistory = () => {
           onClick={closeNewTicket}
         >
           <div
-            className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-xl relative shadow-[0_0_60px_rgba(132,204,22,0.08)] overflow-hidden"
+            className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-xl relative shadow-[0_0_60px_rgba(245,158,11,0.06)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Glow accent top */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#84cc16]/60 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#f59e0b]/60 to-transparent" />
             
             <div className="p-8">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="font-poppins text-xl font-extrabold text-[#84cc16] uppercase tracking-widest">
+                  <h2 className="font-poppins text-xl font-extrabold text-[#facc15] uppercase tracking-widest">
                     Abrir Chamado
                   </h2>
                   <p className="text-xs text-[#52525b] mt-0.5">Preencha os campos abaixo. Nossa equipe responderá em breve.</p>
@@ -382,14 +378,14 @@ const BanHistory = () => {
 
               {ticketSuccess ? (
                 <div className="text-center py-10">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#84cc16]/10 border border-[#84cc16]/30 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-[#84cc16]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/30 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-[#facc15]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                   <h3 className="text-white font-bold text-lg mb-2">Chamado enviado!</h3>
                   <p className="text-[#71717a] text-sm mb-6">Nossa equipe vai analisar e responder em breve.<br/>Fique de olho no painel de tickets.</p>
-                  <button onClick={closeNewTicket} className="bg-[#84cc16] hover:bg-[#65a30d] text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
+                  <button onClick={closeNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
                     Fechar
                   </button>
                 </div>
@@ -404,7 +400,7 @@ const BanHistory = () => {
                       value={newTicket.title}
                       onChange={e => setNewTicket({ ...newTicket, title: e.target.value })}
                       placeholder="Ex: Não consigo acessar o servidor..."
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all"
                     />
                   </div>
 
@@ -415,7 +411,7 @@ const BanHistory = () => {
                         required
                         value={newTicket.server}
                         onChange={e => setNewTicket({ ...newTicket, server: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all appearance-none cursor-pointer"
                       >
                         <option value="" disabled className="bg-[#111113]">Selecione...</option>
                         {SERVERS.map(s => <option key={s} value={s} className="bg-[#111113]">{s}</option>)}
@@ -427,7 +423,7 @@ const BanHistory = () => {
                         required
                         value={newTicket.category}
                         onChange={e => setNewTicket({ ...newTicket, category: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all appearance-none cursor-pointer"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all appearance-none cursor-pointer"
                       >
                         <option value="" disabled className="bg-[#111113]">Selecione...</option>
                         {CATEGORIES.map(c => <option key={c} value={c} className="bg-[#111113]">{c}</option>)}
@@ -443,7 +439,7 @@ const BanHistory = () => {
                       value={newTicket.description}
                       onChange={e => setNewTicket({ ...newTicket, description: e.target.value })}
                       placeholder="Descreva o problema com o máximo de detalhes possível. Inclua horário, jogadores envolvidos, etc."
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#84cc16]/50 focus:ring-1 focus:ring-[#84cc16]/20 transition-all resize-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-[#52525b] focus:outline-none focus:border-[#f59e0b]/50 focus:ring-1 focus:ring-[#f59e0b]/20 transition-all resize-none"
                     />
                   </div>
 
@@ -458,7 +454,7 @@ const BanHistory = () => {
                     <button
                       type="submit"
                       disabled={ticketSubmitting}
-                      className="bg-[#84cc16] hover:bg-[#65a30d] disabled:opacity-60 text-black font-bold px-6 py-2.5 rounded-lg transition-all text-sm shadow-[0_0_16px_rgba(132,204,22,0.25)] hover:shadow-[0_0_24px_rgba(132,204,22,0.4)]"
+                      className="bg-[#f59e0b] hover:bg-[#facc15] disabled:opacity-60 text-black font-bold px-6 py-2.5 rounded-lg transition-all text-sm shadow-[0_0_16px_rgba(245,158,11,0.25)] hover:shadow-[0_0_24px_rgba(250,204,21,0.4)]"
                     >
                       {ticketSubmitting ? 'Enviando...' : 'Abrir Chamado →'}
                     </button>
