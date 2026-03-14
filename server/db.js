@@ -108,6 +108,20 @@ export async function initDatabase() {
       )
     `);
 
+    // Create ticket_messages table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS ticket_messages (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        ticket_id INT NOT NULL,
+        user_id INT NOT NULL,
+        message TEXT NOT NULL,
+        is_staff BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
     console.log('✅ Banco de dados e tabela "users" prontos!');
   } finally {
     connection.release();

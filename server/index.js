@@ -416,7 +416,60 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
+// GET /api/tickets/:id/messages - Get specific ticket and all messages
+app.get('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
+  try {
+    const userId = await getUserId(req, res);
+    if (!userId) return;
+    const ticketId = req.params.id;
+    
+    // First, verify the ticket belongs to the user
+    const [tickets] = await pool.execute('SELECT * FROM tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
+    
+    // Then get messages
+    const [messages] = await pool.execute(
+      `SELECT tm.*, u.username, u.avatar 
+       FROM ticket_messages tm 
+       JOIN users u ON tm.user_id = u.id 
+       WHERE tm.ticket_id = ? 
+       ORDER BY tm.created_at ASC`,
+      [ticketId]
+    );
+    
+    res.json({ ticket: tickets[0], messages });
+  } catch (error) {
+    console.error('Erro ao buscar mensagens:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
 
+// POST /api/tickets/:id/messages - Add message to ticket
+app.post('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
+  try {
+    const userId = await getUserId(req, res);
+    if (!userId) return;
+    const ticketId = req.params.id;
+    const { message } = req.body;
+    
+    if (!message) return res.status(400).json({ error: 'Mensagem vazia' });
+    
+    // Verify the ticket belongs to the user and is not closed
+    const [tickets] = await pool.execute('SELECT * FROM tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
+    if (tickets[0].status === 'closed') return res.status(400).json({ error: 'Este ticket está fechado' });
+    
+    await pool.execute(
+      'INSERT INTO ticket_messages (ticket_id, user_id, message) VALUES (?, ?, ?)',
+      [ticketId, userId, message]
+    );
+    
+    res.status(201).json({ success: true });
+  } catch (error) {
+    console.error('Erro ao enviar mensagem:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
 // =============================================
 // Start Server
 // =============================================
