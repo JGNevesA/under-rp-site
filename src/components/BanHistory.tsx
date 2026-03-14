@@ -127,34 +127,36 @@ const BanHistory = () => {
   return (
     <div className="bg-[#0a0a0a] min-h-screen text-[#f4f4f5] font-sans antialiased">
       <div className="max-w-[1000px] mx-auto px-5 py-16">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <Link to="/" className="inline-block mb-8 text-[#71717a] hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">
+        {/* Header - Only show "VOCÊ ESTÁ BANIDO :(" if there are bans */}
+        <header className="text-center mb-10 text-left md:text-center">
+          <Link to="/" className="inline-block mb-6 text-[#71717a] hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">
             &larr; Voltar para a Home
           </Link>
-          <h1 
-            className="font-poppins text-4xl md:text-5xl font-extrabold uppercase tracking-tight"
-            style={{ 
-              color: '#4ade80', 
-              textShadow: '0 0 30px rgba(74, 222, 128, 0.2)' 
-            }}
-          >
-            VOCÊ ESTÁ BANIDO :(
-          </h1>
+          {bans.length > 0 && (
+            <h1 
+              className="font-poppins text-4xl md:text-5xl font-extrabold uppercase tracking-tight"
+              style={{ 
+                color: '#4ade80', 
+                textShadow: '0 0 30px rgba(74, 222, 128, 0.2)' 
+              }}
+            >
+              VOCÊ ESTÁ BANIDO :(
+            </h1>
+          )}
         </header>
 
         {/* Loading / Error States */}
         {!token && (
           <div className="text-center bg-[#18181b] border border-white/10 p-10 rounded-2xl">
             <h2 className="text-2xl font-bold mb-4">Você precisa estar logado</h2>
-            <p className="text-[#a1a1aa] mb-6">Conecte-se com sua conta do Discord ou Steam para ver seu histórico de bans.</p>
-            <Link to="/" className="bg-[#f59e0b] text-black px-6 py-3 rounded-lg font-bold">Voltar ao Início</Link>
+            <p className="text-[#a1a1aa] mb-6">Conecte-se com sua conta do Discord ou Steam para ver seus tickets e punições.</p>
+            <Link to="/" className="bg-[#f59e0b] text-black px-6 py-3 rounded-lg font-bold">Fazer Login na Home</Link>
           </div>
         )}
 
         {token && isLoading && (
           <div className="text-center py-20 text-[#a1a1aa] animate-pulse">
-            Carregando seu histórico de bans...
+            Carregando sistema de suporte...
           </div>
         )}
 
@@ -164,14 +166,30 @@ const BanHistory = () => {
           </div>
         )}
 
-        {/* Bans List */}
+        {/* Bans List / Empty State */}
         {token && !isLoading && !error && (
           <main className="flex flex-col gap-8">
             {bans.length === 0 ? (
-              <div className="text-center bg-[#18181b] border border-white/10 p-10 rounded-2xl">
-                <span className="text-4xl block mb-4">🎉</span>
-                <h2 className="text-2xl font-bold mb-2">Seu histórico está limpo!</h2>
-                <p className="text-[#a1a1aa]">Não encontramos nenhum ban associado a esta conta.</p>
+              <div className="bg-[#1c1c1e] border border-white/5 rounded-xl p-8 shadow-2xl">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="font-poppins text-2xl font-bold text-[#84cc16] uppercase tracking-wide">
+                    TICKETS DE SUPORTE
+                  </h2>
+                  <button className="bg-transparent border border-white/20 text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-white/5 transition-colors">
+                    Novo
+                  </button>
+                </div>
+                
+                <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
+                  <div className="flex-1">Categoria</div>
+                  <div className="flex-[2]">Titulo</div>
+                  <div className="w-32 text-center">Estado</div>
+                  <div className="w-48 text-right">Ultima Atualiação</div>
+                </div>
+                
+                <div className="text-center py-10">
+                  <p className="text-[#52525b] font-medium text-sm">Nenhum Tíquete de Suporte</p>
+                </div>
               </div>
             ) : (
               bans.map((ban) => {
