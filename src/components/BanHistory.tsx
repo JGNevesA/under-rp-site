@@ -24,7 +24,7 @@ const BanHistory = () => {
   const [ticketSubmitting, setTicketSubmitting] = useState(false);
   const [ticketSuccess, setTicketSuccess] = useState(false);
 
-  const SERVERS = ['UnderRP Principal', 'UnderRP Arena'];
+  const SERVERS = ['UnderRP'];
   const CATEGORIES = ['Dúvidas Gerais', 'Apelo de Punição', 'Problema com Compra', 'Report de Jogador', 'Report de Staff', 'Bug / Erro no Servidor', 'Sugestão', 'Outro'];
 
   const openNewTicket = () => {
@@ -213,7 +213,7 @@ const BanHistory = () => {
               
               {bans.length === 0 ? (
                 <div className="text-center py-10">
-                  <p className="text-[#52525b] font-medium text-sm">Nenhum Tíquete de Suporte</p>
+                  <p className="text-[#52525b] font-medium text-sm">Nenhum Chamado de Suporte</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
