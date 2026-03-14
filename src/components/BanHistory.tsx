@@ -414,7 +414,7 @@ const BanHistory = () => {
                   </div>
                   
                   <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
-                    <div className="w-36 pl-2">Categoria</div>
+                    <div className="w-44 pl-2">Categoria</div>
                     <div className="flex-1">Titulo</div>
                     <div className="w-28 text-center">Estado</div>
                     <div className="w-40 text-right">Ultima Atualização</div>
@@ -437,9 +437,9 @@ const BanHistory = () => {
                         return (
                           <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
-                            <div className="w-36 pl-4">
-                              <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10">
-                                {ticket.category.length > 14 ? ticket.category.substring(0, 14) + '…' : ticket.category}
+                            <div className="w-44 pl-4">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10 whitespace-nowrap">
+                                {ticket.category}
                               </span>
                             </div>
                             <div className="flex-1">
