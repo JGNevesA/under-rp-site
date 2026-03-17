@@ -28,7 +28,6 @@ const RulesSection = () => {
         'Respeito com todo mundo na cidade',
         'Não foca no OOC no meio do RP',
         'Saiba a hora de mandar mensagem',
-        'Português obrigatório no servidor',
         'Evite informações OOC no IC',
       ],
     },
@@ -55,11 +54,8 @@ const RulesSection = () => {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-4">
-            Regras da Cidade
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            A <span className="gold-text">Visão</span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6 mt-4">
+            Regras da <span className="gold-text">Cidade</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Pra cidade fluir legal e todo mundo se divertir fazendo aquele RP brabo, tem que andar na linha. Dá uma lida aqui antes de tomar punição de bobeira.

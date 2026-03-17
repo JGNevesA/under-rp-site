@@ -43,25 +43,53 @@ passport.deserializeUser((obj, done) => {
 passport.use(new SteamStrategy({
     returnURL: process.env.STEAM_RETURN_URL,
     realm: process.env.STEAM_REALM,
-    apiKey: process.env.STEAM_API_KEY
+    apiKey: process.env.STEAM_API_KEY,
+    passReqToCallback: true
   },
-  async function(identifier, profile, done) {
+  async function(req, identifier, profile, done) {
     try {
       // Find or create user
       const steamId = profile.id;
       const username = profile.displayName;
       const avatar = profile.photos && profile.photos.length > 2 ? profile.photos[2].value : (profile.photos[0] ? profile.photos[0].value : null);
 
-      await pool.execute(
-        `INSERT INTO users (steam_id, username, global_name, avatar)
-         VALUES (?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-           username = VALUES(username),
-           global_name = IFNULL(global_name, VALUES(global_name)),
-           avatar = VALUES(avatar),
-           updated_at = CURRENT_TIMESTAMP`,
-        [steamId, username, username, avatar]
-      );
+      let existingUserId = null;
+      if (req.session && req.session.linkToken) {
+        try {
+          const decoded = jwt.verify(req.session.linkToken, process.env.JWT_SECRET);
+          // Only fetch existing ID from DB if needed, or if the token is discord
+          existingUserId = decoded.id; // Usually we don't have this in older tokens, so we should query it:
+          if (!existingUserId) {
+            let uQuery = ''; let uParams = [];
+            if (decoded.steam_id) { uQuery = 'SELECT id FROM users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
+            else if (decoded.discord_id) { uQuery = 'SELECT id FROM users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
+            
+            if (uQuery) {
+              const [rs] = await pool.execute(uQuery, uParams);
+              if (rs.length > 0) existingUserId = rs[0].id;
+            }
+          }
+        } catch(e) {}
+        req.session.linkToken = null;
+      }
+
+      if (existingUserId) {
+        await pool.execute(
+          `UPDATE users SET steam_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+          [steamId, existingUserId]
+        );
+      } else {
+        await pool.execute(
+          `INSERT INTO users (steam_id, username, global_name, avatar)
+           VALUES (?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE
+             username = VALUES(username),
+             global_name = IFNULL(global_name, VALUES(global_name)),
+             avatar = VALUES(avatar),
+             updated_at = CURRENT_TIMESTAMP`,
+          [steamId, username, username, avatar]
+        );
+      }
 
       // We pass the profile forward to generate the JWT
       return done(null, {
@@ -83,6 +111,9 @@ passport.use(new SteamStrategy({
 
 // Step 1: Redirect to Discord authorization
 app.get('/auth/discord', (req, res) => {
+  if (req.query.token) {
+    req.session.linkToken = req.query.token;
+  }
   const params = new URLSearchParams({
     client_id: process.env.DISCORD_CLIENT_ID,
     redirect_uri: process.env.DISCORD_REDIRECT_URI,
@@ -135,28 +166,55 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     const discordUser = userResponse.data;
 
-    // Save or update user in database
-    await pool.execute(
-      `INSERT INTO users (discord_id, username, global_name, avatar, email, access_token, refresh_token)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         username = VALUES(username),
-         global_name = VALUES(global_name),
-         avatar = VALUES(avatar),
-         email = VALUES(email),
-         access_token = VALUES(access_token),
-         refresh_token = VALUES(refresh_token),
-         updated_at = CURRENT_TIMESTAMP`,
-      [
-        discordUser.id,
-        discordUser.username,
-        discordUser.global_name || discordUser.username,
-        discordUser.avatar,
-        discordUser.email || null,
-        access_token,
-        refresh_token || null,
-      ]
-    );
+    // Check if we are linking
+    let existingUserId = null;
+    if (req.session && req.session.linkToken) {
+      try {
+        const decoded = jwt.verify(req.session.linkToken, process.env.JWT_SECRET);
+        existingUserId = decoded.id;
+        if (!existingUserId) {
+          let uQuery = ''; let uParams = [];
+          if (decoded.steam_id) { uQuery = 'SELECT id FROM users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
+          else if (decoded.discord_id) { uQuery = 'SELECT id FROM users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
+          
+          if (uQuery) {
+            const [rs] = await pool.execute(uQuery, uParams);
+            if (rs.length > 0) existingUserId = rs[0].id;
+          }
+        }
+      } catch(e) {}
+      req.session.linkToken = null;
+    }
+
+    if (existingUserId) {
+      await pool.execute(
+        `UPDATE users SET discord_id = ?, email = ?, access_token = ?, refresh_token = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        [discordUser.id, discordUser.email || null, access_token, refresh_token || null, existingUserId]
+      );
+    } else {
+      // Save or update user in database
+      await pool.execute(
+        `INSERT INTO users (discord_id, username, global_name, avatar, email, access_token, refresh_token)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           username = VALUES(username),
+           global_name = VALUES(global_name),
+           avatar = VALUES(avatar),
+           email = VALUES(email),
+           access_token = VALUES(access_token),
+           refresh_token = VALUES(refresh_token),
+           updated_at = CURRENT_TIMESTAMP`,
+        [
+          discordUser.id,
+          discordUser.username,
+          discordUser.global_name || discordUser.username,
+          discordUser.avatar,
+          discordUser.email || null,
+          access_token,
+          refresh_token || null,
+        ]
+      );
+    }
 
     // Create JWT
     const token = jwt.sign(
@@ -180,7 +238,7 @@ app.get('/auth/discord/callback', async (req, res) => {
 });
 
 // Step 3: Get current user data
-app.get('/auth/me', (req, res) => {
+app.get('/auth/me', async (req, res) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -192,20 +250,40 @@ app.get('/auth/me', (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    let userQuery = '';
+    let userParams = [];
+    if (decoded.id) {
+       userQuery = 'SELECT * FROM users WHERE id = ?';
+       userParams = [decoded.id];
+    } else if (decoded.steam_id) {
+       userQuery = 'SELECT * FROM users WHERE steam_id = ?';
+       userParams = [decoded.steam_id];
+    } else if (decoded.discord_id) {
+       userQuery = 'SELECT * FROM users WHERE discord_id = ?';
+       userParams = [decoded.discord_id];
+    }
+
+    if (!userQuery) return res.status(400).json({ error: 'Token inválido' });
+
+    const [users] = await pool.execute(userQuery, userParams);
+    if (users.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+    const dbUser = users[0];
+
     // Build avatar URL based on source
-    let avatarUrl = decoded.avatar;
-    if (decoded.source === 'discord' && !avatarUrl.startsWith('http')) {
-      avatarUrl = decoded.avatar
-        ? `https://cdn.discordapp.com/avatars/${decoded.discord_id}/${decoded.avatar}.png?size=128`
-        : `https://cdn.discordapp.com/embed/avatars/${parseInt(decoded.discord_id || 0) % 5}.png`;
+    let avatarUrl = dbUser.avatar;
+    if (dbUser.discord_id && (!avatarUrl || !avatarUrl.startsWith('http'))) {
+      avatarUrl = dbUser.avatar
+        ? `https://cdn.discordapp.com/avatars/${dbUser.discord_id}/${dbUser.avatar}.png?size=128`
+        : `https://cdn.discordapp.com/embed/avatars/${parseInt(dbUser.discord_id || 0) % 5}.png`;
     }
 
     res.json({
-      id: decoded.discord_id || decoded.steam_id,
-      discord_id: decoded.discord_id,
-      steam_id: decoded.steam_id,
-      username: decoded.username,
-      global_name: decoded.global_name,
+      id: dbUser.id,
+      discord_id: dbUser.discord_id,
+      steam_id: dbUser.steam_id,
+      username: dbUser.username,
+      global_name: dbUser.global_name,
       avatar: avatarUrl,
       source: decoded.source,
     });
@@ -223,9 +301,12 @@ app.post('/auth/logout', (req, res) => {
 // Steam OAuth2 Routes
 // =============================================
 
-app.get('/auth/steam',
-  passport.authenticate('steam', { failureRedirect: process.env.FRONTEND_URL })
-);
+app.get('/auth/steam', (req, res, next) => {
+  if (req.query.token) {
+    req.session.linkToken = req.query.token;
+  }
+  passport.authenticate('steam', { failureRedirect: process.env.FRONTEND_URL })(req, res, next);
+});
 
 app.get('/auth/steam/return',
   passport.authenticate('steam', { failureRedirect: process.env.FRONTEND_URL }),
