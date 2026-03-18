@@ -147,7 +147,7 @@ app.get('/auth/discord/callback', async (req, res) => {
       {
         headers: { 
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept-Encoding': 'application/json',
+          'Accept': 'application/json',
           'User-Agent': 'UnderRP-Auth/1.0 (https://underrp-api.onrender.com)'
         },
       }
@@ -159,7 +159,7 @@ app.get('/auth/discord/callback', async (req, res) => {
     const userResponse = await axios.get('https://discord.com/api/users/@me', {
       headers: { 
         Authorization: `Bearer ${access_token}`,
-        'Accept-Encoding': 'application/json',
+        'Accept': 'application/json',
         'User-Agent': 'UnderRP-Auth/1.0 (https://underrp-api.onrender.com)'
       },
     });
@@ -232,7 +232,12 @@ app.get('/auth/discord/callback', async (req, res) => {
     // Redirect to frontend with token
     res.redirect(`${process.env.FRONTEND_URL}?token=${token}`);
   } catch (error) {
-    console.error('❌ Erro no login Discord:', error.response?.data || error.message);
+    console.error('❌ Erro no login Discord:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      redirect_uri: process.env.DISCORD_REDIRECT_URI
+    });
     res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed`);
   }
 });
