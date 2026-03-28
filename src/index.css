@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --violet: #8b5cf6;
-  --indigo: #6366f1;
-  --sky-blue: #36c0ff;
-  --gold: #facc15;
-  --gold-dark: #eab308;
-  --gold-amber: #f59e0b;
+  /* Theme variables (set dynamically by ThemeContext) */
+  --theme-primary: #36c0ff;
+  --theme-secondary: #8b5cf6;
+  --theme-glow: rgba(54, 192, 255, 0.4);
+  --theme-gradient-from: #36c0ff;
+  --theme-gradient-to: #8b5cf6;
+
+  /* Static colors */
   --bg-dark: #080808;
   --discord-blurple: #5865F2;
 }
@@ -14,45 +16,44 @@
 *,
 *::before,
 *::after {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Smooth theme transition on all elements */
+  transition: background-color 0.7s ease, color 0.7s ease;
 }
 
 body {
   background-color: var(--bg-dark);
   min-height: 100vh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.bg-grid-pattern {
-  background-image:
-    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
+/* ====== Glass Effects ====== */
 
 .glass {
-  background: rgba(20, 20, 30, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.15);
+  background: rgba(12, 12, 20, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(20, 20, 35, 0.6);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(12, 12, 20, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+/* ====== Gradient Text ====== */
+
 .gradient-text {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #36c0ff 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -69,6 +70,13 @@ body {
   background-clip: text;
 }
 
+/* ====== Glow Effects ====== */
+
+.glow-theme {
+  box-shadow: 0 0 40px var(--theme-glow), 0 0 80px color-mix(in srgb, var(--theme-glow) 50%, transparent);
+  transition: box-shadow 0.7s ease;
+}
+
 .glow-violet {
   box-shadow: 0 0 60px rgba(139, 92, 246, 0.3), 0 0 120px rgba(99, 102, 241, 0.2);
 }
@@ -76,6 +84,8 @@ body {
 .glow-gold {
   box-shadow: 0 0 30px rgba(250, 204, 21, 0.4);
 }
+
+/* ====== Neon Borders ====== */
 
 .neon-border {
   position: relative;
@@ -87,34 +97,40 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, #8b5cf6, #6366f1, #36c0ff);
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+  transition: background 0.7s ease;
 }
 
 .gold-border::before {
   background: linear-gradient(135deg, #facc15, #f59e0b, #eab308);
 }
 
+/* ====== Animations ====== */
+
 @keyframes pulse-glow {
-
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
-/* Shiny Card Effect */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ====== Shiny Card Effect ====== */
+
 .shiny-card {
   --card-background-color: rgba(255, 255, 255, .015);
   --card-border-color: rgba(255, 255, 255, 0.1);
@@ -132,7 +148,6 @@ body {
   --card-shine-gradient: conic-gradient(from 205deg at 50% 50%, rgba(16, 185, 129, 0) 0deg, #10B981 25deg, rgba(52, 211, 153, 0.18) 295deg, rgba(16, 185, 129, 0) 360deg);
   --card-line-color: #2A2B2C;
   --card-tile-color: rgba(16, 185, 129, 0.05);
-
   --card-hover-border-color: rgba(255, 255, 255, 0.2);
   --card-hover-box-shadow-1: rgba(0, 0, 0, 0.04);
   --card-hover-box-shadow-1-y: 5px;
@@ -146,7 +161,6 @@ body {
 }
 
 .shiny-card.popular {
-  /* Customize popular colors */
   --card-shine-gradient: conic-gradient(from 205deg at 50% 50%, rgba(234, 179, 8, 0) 0deg, #eab308 25deg, rgba(234, 179, 8, 0.18) 295deg, rgba(234, 179, 8, 0) 360deg);
   --card-tile-color: rgba(234, 179, 8, 0.05);
   --card-hover-icon-color: #facc15;
@@ -343,4 +357,23 @@ body {
 .shiny-card:hover .background .line.line-3::before,
 .shiny-card:hover .background .line.line-3::after {
   transition-delay: .3s;
+}
+
+/* ====== Scrollbar ====== */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
