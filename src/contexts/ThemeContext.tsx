@@ -15,10 +15,10 @@ interface ThemeContextType {
 
 const dayTheme: ThemeColors = {
   primary: '#f59e0b',
-  secondary: '#facc15',
+  secondary: '#faf215',
   glow: 'rgba(245, 158, 11, 0.4)',
   gradientFrom: '#f59e0b',
-  gradientTo: '#facc15',
+  gradientTo: '#faf215',
 };
 
 const nightTheme: ThemeColors = {

@@ -1,4 +1,23 @@
+/* ====== Custom Fonts (must be before Tailwind) ====== */
+
+@font-face {
+  font-family: 'TacticSans Ultra';
+  src: url('/fonts/TacticSansExd-Ult.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TacticSans Bold';
+  src: url('/fonts/TacticSans-Bld.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Theme variables (set dynamically by ThemeContext) */
@@ -9,19 +28,24 @@
   --theme-gradient-to: #8b5cf6;
 
   /* Static colors */
-  --bg-dark: #080808;
+  --bg-dark: #07070a;
   --discord-blurple: #5865F2;
+
+  /* Font families */
+  --font-headline: 'TacticSans Ultra', 'Outfit', 'Inter', sans-serif;
+  --font-subtitle: 'TacticSans Bold', 'Outfit', 'Inter', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 *,
 *::before,
 *::after {
-  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-body) !important;
 }
 
 html {
   scroll-behavior: smooth;
-  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-body) !important;
   /* Smooth theme transition on all elements */
   transition: background-color 0.7s ease, color 0.7s ease;
 }
@@ -29,9 +53,23 @@ html {
 body {
   background-color: var(--bg-dark);
   min-height: 100vh;
-  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-body) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ====== Typography Hierarchy ====== */
+
+h1,
+h2 {
+  font-family: var(--font-headline) !important;
+  letter-spacing: -0.02em;
+}
+
+h3,
+h4 {
+  font-family: var(--font-subtitle) !important;
+  letter-spacing: -0.01em;
 }
 
 /* ====== Glass Effects ====== */

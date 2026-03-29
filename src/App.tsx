@@ -70,7 +70,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
+      <div className="min-h-screen bg-[#07070a] text-white overflow-x-hidden">
         {/* Particle Background */}
         <ParticleBackground />
 

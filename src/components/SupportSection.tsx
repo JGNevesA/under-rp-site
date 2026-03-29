@@ -83,7 +83,7 @@ const SupportSection = () => {
             </svg>
             <span className="text-violet-400 font-medium">Central de Ajuda</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: 'var(--font-headline)' }}>
             Precisa de <span className="text-sky-400">Ajuda</span>?
           </h2>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
@@ -110,7 +110,7 @@ const SupportSection = () => {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
+                <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>{option.title}</h3>
                 <p className="text-gray-400 text-sm mb-4 leading-relaxed">{option.description}</p>
 
                 {/* Action */}
@@ -128,7 +128,7 @@ const SupportSection = () => {
         {/* FAQ Section */}
         <div className="max-w-5xl mx-auto">
           <div className="bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-xl rounded-3xl border border-white/10 p-8 md:p-12">
-            <h3 className="text-3xl sm:text-4xl font-bold text-white text-center mb-10">
+            <h3 className="text-3xl sm:text-4xl font-bold text-white text-center mb-10" style={{ fontFamily: 'var(--font-headline)' }}>
               Perguntas Frequentes
             </h3>
 
@@ -136,7 +136,7 @@ const SupportSection = () => {
             <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
               {faqItems.map((item, index) => (
                 <div key={index} className="border-b border-white/10 pb-6">
-                  <h4 className="text-base font-bold text-white mb-2">{item.question}</h4>
+                  <h4 className="text-base font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>{item.question}</h4>
                   <p className="text-gray-400 text-sm leading-relaxed">{item.answer}</p>
                 </div>
               ))}

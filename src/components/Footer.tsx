@@ -1,3 +1,5 @@
+import { Logo } from './Logo';
+
 const Footer = () => {
   return (
     <footer className="relative pt-20 pb-10 border-t border-white/5">
@@ -8,13 +10,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            <a href="#inicio" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 via-indigo-500 to-sky-400 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                <span className="text-white font-bold text-lg">U</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-violet-400 via-indigo-400 to-sky-400 bg-clip-text text-transparent">
-                UNDER RP
-              </span>
+            <a href="#inicio" className="flex items-center group mb-6 hover:opacity-90 transition-opacity duration-300">
+              <Logo variant="icon" iconClassName="h-[42px] w-auto relative top-[-2px]" />
             </a>
             <p className="text-gray-400 text-sm mb-6 leading-relaxed">
               O melhor servidor de GTA V Roleplay do Brasil. Experimente uma gameplay imersiva com 
@@ -64,7 +61,7 @@ const Footer = () => {
 
           {/* Navigation */}
           <div>
-            <h4 className="text-white font-semibold mb-6">Navegação</h4>
+            <h4 className="text-white font-semibold mb-6" style={{ fontFamily: 'var(--font-subtitle)' }}>Navegação</h4>
             <ul className="space-y-3">
               {[
                 { name: 'Início', href: '#inicio' },
@@ -88,7 +85,7 @@ const Footer = () => {
 
           {/* Suporte */}
           <div>
-            <h4 className="text-white font-semibold mb-6">Suporte</h4>
+            <h4 className="text-white font-semibold mb-6" style={{ fontFamily: 'var(--font-subtitle)' }}>Suporte</h4>
             <ul className="space-y-3">
               {[
                 { name: 'Central de Ajuda', href: '#suporte' },
@@ -111,7 +108,7 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="text-white font-semibold mb-6">Legal</h4>
+            <h4 className="text-white font-semibold mb-6" style={{ fontFamily: 'var(--font-subtitle)' }}>Legal</h4>
             <ul className="space-y-3">
               {[
                 { name: 'Termos de Uso', href: '#' },

@@ -211,7 +211,7 @@ const DonationSection = () => {
             <span className="text-amber-400 text-xl">💎</span>
             <span className="text-amber-300 font-semibold tracking-wide uppercase text-xs">Apoie o Servidor</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight" style={{ fontFamily: 'var(--font-headline)' }}>
             Loja de <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Doações</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
@@ -310,7 +310,7 @@ const DonationSection = () => {
                   )}
 
                   {/* Título */}
-                  <h3 className="text-base font-extrabold text-white mb-3 tracking-wide group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-cyan-300 transition-all duration-300">
+                  <h3 className="text-base font-extrabold text-white mb-3 tracking-wide group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-cyan-300 transition-all duration-300" style={{ fontFamily: 'var(--font-subtitle)' }}>
                     {item.name}
                   </h3>
 
@@ -319,7 +319,7 @@ const DonationSection = () => {
                     <div className="absolute top-0 left-0 w-1 h-full rounded-l-xl bg-gradient-to-b from-blue-500 via-cyan-400 to-blue-600" />
                     <div className="pl-3">
                       <span className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Valor</span>
-                      <p className="text-2xl font-black bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent mt-0.5">
+                      <p className="text-2xl font-black bg-gradient-to-r from-emerald-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent mt-0.5" style={{ fontFamily: 'var(--font-headline)' }}>
                         {item.price}
                       </p>
                       {item.weeklyPrice && (
@@ -369,7 +369,7 @@ const DonationSection = () => {
         ) : (
           <div className="text-center py-20 bg-[#101827] border border-white/5 rounded-xl">
             <span className="text-4xl block mb-4">🛑</span>
-            <h3 className="text-xl font-bold text-white mb-2">Nenhum item encontrado</h3>
+            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>Nenhum item encontrado</h3>
             <p className="text-slate-400">Não há itens disponíveis nesta categoria no momento.</p>
           </div>
         )}

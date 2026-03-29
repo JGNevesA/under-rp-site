@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
+import { Logo } from './Logo';
 
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
 
@@ -28,37 +29,6 @@ const ChartIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
   </svg>
 );
-
-const ArcTilt = ({ children, className = "", scale = "1.02" }: { children: React.ReactNode, className?: string, scale?: string }) => {
-  const boundingRef = useRef<DOMRect | null>(null);
-
-  return (
-    <div className={`[perspective:800px] ${className}`}>
-      <div
-        onMouseLeave={() => (boundingRef.current = null)}
-        onMouseEnter={(ev) => {
-          boundingRef.current = ev.currentTarget.getBoundingClientRect();
-        }}
-        onMouseMove={(ev) => {
-          if (!boundingRef.current) return;
-          const x = ev.clientX - boundingRef.current.left;
-          const y = ev.clientY - boundingRef.current.top;
-          const xPercentage = x / boundingRef.current.width;
-          const yPercentage = y / boundingRef.current.height;
-          const xRotation = (xPercentage - 0.5) * 20;
-          const yRotation = (0.5 - yPercentage) * 20;
-
-          ev.currentTarget.style.setProperty("--x-rotation", `${yRotation}deg`);
-          ev.currentTarget.style.setProperty("--y-rotation", `${xRotation}deg`);
-        }}
-        className="transition-transform duration-200 ease-out w-full h-full hover:[transform:rotateX(var(--x-rotation))_rotateY(var(--y-rotation))_scale(var(--scale))]"
-        style={{ transformStyle: 'preserve-3d', '--scale': scale } as React.CSSProperties}
-      >
-        {children}
-      </div>
-    </div>
-  );
-};
 
 const HeroSection = () => {
   const { theme } = useTheme();
@@ -181,11 +151,11 @@ const HeroSection = () => {
   });
 
   const tiltLeft = {
-    transform: `perspective(1200px) rotateY(${2 + mouse.x * 2}deg) rotateX(${-mouse.y * 2}deg)`,
+    transform: `perspective(1000px) rotateY(${15 + mouse.x * 6}deg) rotateX(${-mouse.y * 4}deg)`,
     transition: 'transform 0.2s ease-out',
   };
   const tiltRight = {
-    transform: `perspective(1200px) rotateY(${-3 + mouse.x * 2}deg) rotateX(${-mouse.y * 2}deg)`,
+    transform: `perspective(1000px) rotateY(${-15 + mouse.x * 6}deg) rotateX(${-mouse.y * 4}deg)`,
     transition: 'transform 0.2s ease-out',
   };
 
@@ -211,8 +181,8 @@ const HeroSection = () => {
       <canvas ref={canvasRef} className="absolute inset-0 z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10 lg:py-0">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+      <div className="relative z-10 w-full max-w-[90rem] mx-auto px-6 sm:px-8 lg:px-16 py-10 lg:py-0">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 w-full">
 
           {/* ── LEFT COLUMN ── */}
           <motion.div
@@ -220,36 +190,31 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex-1 max-w-xl"
-            style={tiltLeft}
           >
+            <div style={{ ...tiltLeft, transformStyle: 'preserve-3d' }} className="w-full h-full">
 
-
-            {/* Title */}
-            <ArcTilt scale="1.05">
-              <motion.h1
+            {/* Title / Logo */}
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.7 }}
-                className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 tracking-tight leading-[1.0]"
-                style={{ fontFamily: "'Outfit', 'Inter', sans-serif", ...parallax(0.15) }}
+                className="mb-8"
+                style={parallax(0.15)}
               >
-                <span
-                  className="bg-clip-text text-transparent transition-all duration-700"
-                  style={{ backgroundImage: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
-                >
-                  UNDER
-                </span>
-                <span className="text-white ml-3">RP</span>
-              </motion.h1>
-            </ArcTilt>
+                <Logo 
+                  variant="text"
+                  className="items-center justify-start" 
+                  textClassName="h-[136px] sm:h-[187px] md:h-[255px] lg:h-[306px] w-auto drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)] transition-all duration-500" 
+                />
+              </motion.div>
 
             {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.65 }}
-              className="text-xl md:text-2xl font-semibold mb-4 font-outfit transition-colors duration-700"
-              style={{ color: theme.primary, ...parallax(0.1) }}
+              className="text-xl md:text-2xl font-semibold mb-4 transition-colors duration-700"
+              style={{ color: theme.primary, fontFamily: 'var(--font-subtitle)', ...parallax(0.1) }}
             >
               A experiência mais imersiva de GTA RP
             </motion.p>
@@ -267,7 +232,7 @@ const HeroSection = () => {
               uma comunidade vibrante te esperam.
             </motion.p>
 
-
+            </div>
           </motion.div>
 
           {/* ── RIGHT COLUMN ── */}
@@ -276,10 +241,10 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex-1 flex flex-col items-center lg:items-end max-w-md w-full"
-            style={tiltRight}
           >
+            <div style={{ ...tiltRight, transformStyle: 'preserve-3d' }} className="w-full h-full flex flex-col items-center lg:items-end">
             {/* Server Online Badge (Moved above the Queue Card) */}
-            <div className="w-full max-w-sm flex items-center justify-center lg:justify-start mb-6">
+            <div className="w-full max-w-sm flex items-center justify-center mb-6">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -300,16 +265,15 @@ const HeroSection = () => {
             </div>
 
             {/* Queue Card */}
-            <ArcTilt className="w-full max-w-sm" scale="1.05">
               <div
-                className="w-full h-full glass-card rounded-2xl p-6 relative overflow-hidden neon-border"
+                className="w-full max-w-sm h-full glass-card rounded-2xl p-6 relative overflow-hidden neon-border"
                 style={parallax(0.4)}
               >
                 <div className="relative z-10">
                   {/* Card Header */}
                   <div className="flex items-center justify-between mb-5">
                     <div>
-                      <h3 className="text-white font-bold text-lg font-outfit">Fila do Servidor</h3>
+                      <h3 className="text-white font-bold text-lg" style={{ fontFamily: 'var(--font-subtitle)' }}>Fila do Servidor</h3>
                       <p className="text-gray-500 text-xs mt-0.5">Status em tempo real</p>
                     </div>
                     <div
@@ -336,8 +300,8 @@ const HeroSection = () => {
                     />
                     <div className="relative">
                       <div
-                        className="text-5xl font-black mb-1 bg-clip-text text-transparent font-outfit transition-all duration-700"
-                        style={{ backgroundImage: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
+                        className="text-5xl font-black mb-1 bg-clip-text text-transparent transition-all duration-700"
+                        style={{ backgroundImage: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`, fontFamily: 'var(--font-headline)' }}
                       >
                         #{stats.queuePosition}
                       </div>
@@ -359,7 +323,6 @@ const HeroSection = () => {
                   </div>
                 </div>
               </div>
-            </ArcTilt>
 
             {/* Steam & Discord buttons — below card */}
             <motion.div
@@ -388,7 +351,8 @@ const HeroSection = () => {
                 <DiscordIcon />
                 Discord
               </button>
-            </motion.div>
+             </motion.div>
+            </div>
           </motion.div>
 
         </div>

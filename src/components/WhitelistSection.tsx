@@ -56,7 +56,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
           <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-4">
             Whitelist
           </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: 'var(--font-headline)' }}>
             Bora pra <span className="gradient-text">Cidade?</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -75,7 +75,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
 
               <div className="glass-card rounded-2xl p-6 h-full hover:scale-[1.02] transition-all duration-300 neon-border">
                 {/* Step Number */}
-                <span className="text-5xl font-black gradient-text opacity-20 absolute top-4 right-4">
+                <span className="text-5xl font-black gradient-text opacity-20 absolute top-4 right-4" style={{ fontFamily: 'var(--font-headline)' }}>
                   {step.number}
                 </span>
 
@@ -85,7 +85,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>{step.title}</h3>
                 <p className="text-gray-400">{step.description}</p>
               </div>
             </div>
@@ -95,7 +95,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
         {/* Whitelist Form Preview */}
         <div className="glass-card rounded-3xl p-8 md:p-12 max-w-4xl mx-auto glow-violet">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">Tá esperando o quê?</h3>
+            <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>Tá esperando o quê?</h3>
             <p className="text-gray-400">
               Clica aí embaixo e já garante tua vaga na cidade.
             </p>

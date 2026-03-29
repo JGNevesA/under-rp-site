@@ -27,7 +27,7 @@ const AboutSection = () => {
             backgroundImage: 'url(https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2064)',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-[#080808]/95 to-[#080808]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07070a] via-[#07070a]/95 to-[#07070a]" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -36,7 +36,7 @@ const AboutSection = () => {
           <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-violet-500/10 text-violet-400 border border-violet-500/20 mb-4">
             A Cidade
           </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ fontFamily: 'var(--font-headline)' }}>
             <span className="gradient-text">Bem-vindo a UNDER RP</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -48,7 +48,7 @@ const AboutSection = () => {
           {/* Left Content */}
           <div className="space-y-8">
             <div className="glass-card rounded-2xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-white">
+              <h3 className="text-2xl font-bold mb-6 text-white" style={{ fontFamily: 'var(--font-subtitle)' }}>
                 Por que escolher o <span className="gold-text">UNDER RP</span>?
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -69,7 +69,7 @@ const AboutSection = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {stats.map((stat, index) => (
                 <div key={index} className="glass-card rounded-xl p-4 text-center">
-                  <p className="text-2xl sm:text-3xl font-bold gold-text mb-1">{stat.value}</p>
+                  <p className="text-2xl sm:text-3xl font-bold gold-text mb-1" style={{ fontFamily: 'var(--font-headline)' }}>{stat.value}</p>
                   <p className="text-sm text-gray-400">{stat.label}</p>
                 </div>
               ))}
@@ -86,7 +86,7 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Host BR Premium</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>Host BR Premium</h4>
                   <p className="text-gray-400">FPS cravado e ping liso. Infraestrutura de ponta pra você jogar sem ter dor de cabeça.</p>
                 </div>
               </div>
@@ -100,7 +100,7 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Staff Presente</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>Staff Presente</h4>
                   <p className="text-gray-400">Equipe online e pronta pra atender chamado na hora. Aqui a gente valoriza o seu RP justo.</p>
                 </div>
               </div>
@@ -114,7 +114,7 @@ const AboutSection = () => {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Novidades toda semana</h4>
+                  <h4 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>Novidades toda semana</h4>
                   <p className="text-gray-400">A cidade não para! Scripts novos, melhorias e carros inéditos chegando sempre.</p>
                 </div>
               </div>

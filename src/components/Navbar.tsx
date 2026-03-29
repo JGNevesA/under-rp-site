@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User } from '../App';
 import { useTheme } from '../contexts/ThemeContext';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   user: User | null;
@@ -50,19 +51,8 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <a href="/#inicio" className="flex items-center gap-2 group">
-              <span
-                className="text-2xl font-black tracking-tight transition-colors duration-700"
-                style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}
-              >
-                <span
-                  className="bg-clip-text text-transparent transition-all duration-700"
-                  style={{ backgroundImage: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
-                >
-                  UNDER
-                </span>
-                <span className="text-white ml-1.5">RP</span>
-              </span>
+            <a href="/#inicio" className="flex items-center group hover:opacity-90 transition-opacity duration-300">
+              <Logo variant="icon" iconClassName="h-[42px] w-auto relative top-[-2px]" />
             </a>
 
             {/* Desktop Navigation */}
@@ -72,6 +62,7 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                   key={item.name}
                   href={item.href}
                   className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200"
+                  style={{ fontFamily: 'var(--font-subtitle)' }}
                 >
                   {item.name}
                 </a>
@@ -118,6 +109,15 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                             <p className="text-sm font-medium text-white">{user.global_name}</p>
                             <p className="text-xs text-gray-400">@{user.username}</p>
                           </div>
+                          <a
+                            href="/bans"
+                            className="w-full px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 text-left flex items-center gap-2 transition-colors border-b border-white/10"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Painel / Suporte
+                          </a>
                           <button
                             onClick={handleLogout}
                             className="w-full px-4 py-3 text-sm text-red-400 hover:bg-white/5 text-left flex items-center gap-2 transition-colors"
@@ -196,12 +196,21 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                             <p className="text-xs text-gray-400">@{user.username}</p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                          className="text-red-400 hover:text-red-300 text-sm font-medium"
-                        >
-                          Sair
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <a
+                            href="/bans"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-gray-400 hover:text-white text-sm font-medium"
+                          >
+                            Painel
+                          </a>
+                          <button
+                            onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                            className="text-red-400 hover:text-red-300 text-sm font-medium"
+                          >
+                            Sair
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}

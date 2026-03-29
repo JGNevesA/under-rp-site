@@ -88,7 +88,7 @@ const MonthlyVehicles = () => {
                         <span className="text-blue-400 text-xl">🏎️</span>
                         <span className="text-blue-300 font-semibold tracking-wide uppercase text-xs">Concessionária VIP</span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight">
+                    <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight" style={{ fontFamily: 'var(--font-headline)' }}>
                         Veículos{' '}
                         <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
                             Mensais
@@ -143,7 +143,7 @@ const MonthlyVehicles = () => {
 
                                 {/* Content */}
                                 <div className="relative z-10 flex-grow">
-                                    <h3 className="text-2xl font-bold text-white tracking-tight mb-2">
+                                    <h3 className="text-2xl font-bold text-white tracking-tight mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>
                                         {vehicle.name}
                                     </h3>
                                     <p className="text-sm text-slate-400 leading-relaxed max-w-[250px]">
@@ -154,7 +154,7 @@ const MonthlyVehicles = () => {
                                 {/* Pricing & CTA */}
                                 <div className="relative z-10 mt-8">
                                     <div className="flex items-end gap-1 mb-5">
-                                        <span className={`text-4xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
+                                        <span className={`text-4xl font-black bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`} style={{ fontFamily: 'var(--font-headline)' }}>
                                             {vehicle.price}
                                         </span>
                                         <span className="text-sm font-medium text-slate-500 mb-1.5">/ mês</span>

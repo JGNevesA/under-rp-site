@@ -54,7 +54,7 @@ const RulesSection = () => {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 mt-4">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6 mt-4" style={{ fontFamily: 'var(--font-headline)' }}>
             Regras da <span className="gold-text">Cidade</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -75,7 +75,7 @@ const RulesSection = () => {
               </div>
 
               {/* Title */}
-              <h3 className="text-2xl font-bold text-white mb-2">{category.title}</h3>
+              <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>{category.title}</h3>
               <p className="text-gray-400 mb-6">{category.description}</p>
 
               {/* Rules List */}
@@ -100,7 +100,7 @@ const RulesSection = () => {
               </svg>
             </div>
             <div className="flex-1">
-              <h4 className="text-lg font-semibold text-white mb-1">Aviso da Staff</h4>
+              <h4 className="text-lg font-semibold text-white mb-1" style={{ fontFamily: 'var(--font-subtitle)' }}>Aviso da Staff</h4>
               <p className="text-gray-400">
                 Se pisar na bola ou cometer Anti-RP, vai de ralo (kick ou ban). Tem dúvida de algo que pode ou não fazer? Abre um ticket no Discord antes de fazer besteira in-game.
               </p>
