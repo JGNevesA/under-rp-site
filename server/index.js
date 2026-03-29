@@ -18,9 +18,50 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
+// =============================================
+// Epic Games KWS Webhook (Verificação Parental)
+// =============================================
+// Esta rota precisa vir antes do app.use(express.json()) para obtermos o body "cru" para validar a assinatura.
+app.post('/api/webhook/epic-kws', express.raw({ type: 'application/json' }), async (req, res) => {
+  const secret = process.env.EPIC_WEBHOOK_SECRET;
+  
+  if (!secret) {
+    console.log('⚠️ Webhook recebido, mas EPIC_WEBHOOK_SECRET não está configurado no .env!');
+    return res.status(500).send('Secret não configurado');
+  }
+
+  const signature = req.headers['x-kws-signature']; // O header oficial da Epic Games KWS
+  if (!signature) {
+    return res.status(401).send('Assinatura ausente');
+  }
+
+  try {
+    const crypto = await import('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(req.body) // req.body é um Buffer cruntamente pelo express.raw
+      .digest('hex');
+
+    if (signature === expectedSignature) {
+      const payload = JSON.parse(req.body.toString());
+      console.log('✅ Epic KWS Webhook Válido recebido!', payload);
+      
+      // TODO: Quando o banco do FiveM estiver pronto com a coluna de idade, desative o comentário abaixo e adapte os nomes das colunas:
+      // const epicUserId = payload.userId; // Ajuste conforme a documentação da KWS
+      // await pool.execute('UPDATE users SET vrp_verificado = 1 WHERE epic_account_id = ?', [epicUserId]);
+
+      res.status(200).send('OK');
+    } else {
+      console.log('❌ Epic KWS Webhook Assinatura Inválida!');
+      res.status(401).send('Assinatura inválida');
+    }
+  } catch (error) {
+    console.error('❌ Erro processando webhook Epic:', error);
+    res.status(500).send('Erro Interno');
+  }
+});
 
 app.use(express.json());
-
 // Session is required for Passport OpenID
 app.use(session({
   secret: process.env.JWT_SECRET,
