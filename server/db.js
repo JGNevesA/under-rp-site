@@ -33,7 +33,7 @@ export async function initDatabase() {
   const connection = await pool.getConnection();
   try {
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE IF NOT EXISTS site_users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         discord_id VARCHAR(255) UNIQUE,
         steam_id VARCHAR(255) UNIQUE,
@@ -48,23 +48,16 @@ export async function initDatabase() {
       )
     `);
 
-    // Ensure steam_id column exists for existing tables
     try {
-      await connection.execute(`ALTER TABLE users ADD COLUMN steam_id VARCHAR(255) UNIQUE`);
-    } catch (e) {
-      // Ignore if column already exists
-    }
+      await connection.execute(`ALTER TABLE site_users ADD COLUMN steam_id VARCHAR(255) UNIQUE`);
+    } catch (e) {}
     
-    // Make discord_id nullable to support Steam-only logins initially
     try {
-      await connection.execute(`ALTER TABLE users MODIFY discord_id VARCHAR(255) NULL`);
-    } catch (e) {
-      // Ignore errors
-    }
+      await connection.execute(`ALTER TABLE site_users MODIFY discord_id VARCHAR(255) NULL`);
+    } catch (e) {}
 
-    // Create bans table
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS bans (
+      CREATE TABLE IF NOT EXISTS site_bans (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         reason TEXT NOT NULL,
@@ -72,13 +65,12 @@ export async function initDatabase() {
         banned_until TIMESTAMP NULL,
         server_name VARCHAR(255) DEFAULT 'FiveM Brazil',
         status ENUM('active', 'expired', 'revoked') DEFAULT 'active',
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES site_users(id) ON DELETE CASCADE
       )
     `);
 
-    // Create appeals table
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS appeals (
+      CREATE TABLE IF NOT EXISTS site_appeals (
         id INT AUTO_INCREMENT PRIMARY KEY,
         ban_id INT NOT NULL,
         user_id INT NOT NULL,
@@ -87,15 +79,13 @@ export async function initDatabase() {
         status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (ban_id) REFERENCES bans(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES site_users(id) ON DELETE CASCADE,
         UNIQUE KEY(ban_id)
       )
     `);
 
-    // Create tickets table
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS tickets (
+      CREATE TABLE IF NOT EXISTS site_tickets (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         title VARCHAR(200) NOT NULL,
@@ -104,21 +94,20 @@ export async function initDatabase() {
         status ENUM('open', 'in_progress', 'closed') DEFAULT 'open',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES site_users(id) ON DELETE CASCADE
       )
     `);
 
-    // Create ticket_messages table
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS ticket_messages (
+      CREATE TABLE IF NOT EXISTS site_ticket_messages (
         id INT AUTO_INCREMENT PRIMARY KEY,
         ticket_id INT NOT NULL,
         user_id INT NOT NULL,
         message TEXT NOT NULL,
         is_staff BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (ticket_id) REFERENCES site_tickets(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES site_users(id) ON DELETE CASCADE
       )
     `);
 

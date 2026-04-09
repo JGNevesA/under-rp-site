@@ -102,8 +102,8 @@ passport.use(new SteamStrategy({
           existingUserId = decoded.id; // Usually we don't have this in older tokens, so we should query it:
           if (!existingUserId) {
             let uQuery = ''; let uParams = [];
-            if (decoded.steam_id) { uQuery = 'SELECT id FROM users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
-            else if (decoded.discord_id) { uQuery = 'SELECT id FROM users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
+            if (decoded.steam_id) { uQuery = 'SELECT id FROM site_users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
+            else if (decoded.discord_id) { uQuery = 'SELECT id FROM site_users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
             
             if (uQuery) {
               const [rs] = await pool.execute(uQuery, uParams);
@@ -116,12 +116,12 @@ passport.use(new SteamStrategy({
 
       if (existingUserId) {
         await pool.execute(
-          `UPDATE users SET steam_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+          `UPDATE site_users SET steam_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
           [steamId, existingUserId]
         );
       } else {
         await pool.execute(
-          `INSERT INTO users (steam_id, username, global_name, avatar)
+          `INSERT INTO site_users (steam_id, username, global_name, avatar)
            VALUES (?, ?, ?, ?)
            ON DUPLICATE KEY UPDATE
              username = VALUES(username),
@@ -215,8 +215,8 @@ app.get('/auth/discord/callback', async (req, res) => {
         existingUserId = decoded.id;
         if (!existingUserId) {
           let uQuery = ''; let uParams = [];
-          if (decoded.steam_id) { uQuery = 'SELECT id FROM users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
-          else if (decoded.discord_id) { uQuery = 'SELECT id FROM users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
+          if (decoded.steam_id) { uQuery = 'SELECT id FROM site_users WHERE steam_id=?'; uParams = [decoded.steam_id]; }
+          else if (decoded.discord_id) { uQuery = 'SELECT id FROM site_users WHERE discord_id=?'; uParams = [decoded.discord_id]; }
           
           if (uQuery) {
             const [rs] = await pool.execute(uQuery, uParams);
@@ -229,13 +229,13 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     if (existingUserId) {
       await pool.execute(
-        `UPDATE users SET discord_id = ?, email = ?, access_token = ?, refresh_token = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        `UPDATE site_users SET discord_id = ?, email = ?, access_token = ?, refresh_token = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
         [discordUser.id, discordUser.email || null, access_token, refresh_token || null, existingUserId]
       );
     } else {
       // Save or update user in database
       await pool.execute(
-        `INSERT INTO users (discord_id, username, global_name, avatar, email, access_token, refresh_token)
+        `INSERT INTO site_users (discord_id, username, global_name, avatar, email, access_token, refresh_token)
          VALUES (?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
            username = VALUES(username),
@@ -299,13 +299,13 @@ app.get('/auth/me', async (req, res) => {
     let userQuery = '';
     let userParams = [];
     if (decoded.id) {
-       userQuery = 'SELECT * FROM users WHERE id = ?';
+       userQuery = 'SELECT * FROM site_users WHERE id = ?';
        userParams = [decoded.id];
     } else if (decoded.steam_id) {
-       userQuery = 'SELECT * FROM users WHERE steam_id = ?';
+       userQuery = 'SELECT * FROM site_users WHERE steam_id = ?';
        userParams = [decoded.steam_id];
     } else if (decoded.discord_id) {
-       userQuery = 'SELECT * FROM users WHERE discord_id = ?';
+       userQuery = 'SELECT * FROM site_users WHERE discord_id = ?';
        userParams = [decoded.discord_id];
     }
 
@@ -398,38 +398,36 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-// GET /api/bans - Get all bans for the logged-in user
+// GET /api/bans - Get all bans for the logged-in user (reads directly from FiveM bans table)
 app.get('/api/bans', authenticateToken, async (req, res) => {
   try {
     const { discord_id, steam_id } = req.user;
     
-    // First, find the user's ID in the database
-    let userQuery = '';
-    let userParams = [];
+    let bans = [];
     
-    if (steam_id) {
-      userQuery = 'SELECT id FROM users WHERE steam_id = ?';
-      userParams = [steam_id];
-    } else if (discord_id) {
-      userQuery = 'SELECT id FROM users WHERE discord_id = ?';
-      userParams = [discord_id];
-    } else {
-      return res.status(400).json({ error: 'Usuário inválido' });
+    // Try to match by Discord ID first (most reliable)
+    if (discord_id) {
+      const [rows] = await pool.execute(`
+        SELECT b.*, a.status as appeal_status, a.id as appeal_id
+        FROM bans b
+        LEFT JOIN site_appeals a ON b.id = a.ban_id
+        WHERE b.discord = ? OR b.discord = ?
+        ORDER BY b.id DESC
+      `, [discord_id, `discord:${discord_id}`]);
+      bans = rows;
     }
     
-    const [users] = await pool.execute(userQuery, userParams);
-    if (users.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
-    
-    const userId = users[0].id;
-    
-    // Fetch bans and their associated appeal status
-    const [bans] = await pool.execute(`
-      SELECT b.*, a.status as appeal_status, a.id as appeal_id
-      FROM bans b
-      LEFT JOIN appeals a ON b.id = a.ban_id
-      WHERE b.user_id = ?
-      ORDER BY b.banned_at DESC
-    `, [userId]);
+    // Fallback: try to match by Steam license if no discord match
+    if (bans.length === 0 && steam_id) {
+      const [rows] = await pool.execute(`
+        SELECT b.*, a.status as appeal_status, a.id as appeal_id
+        FROM bans b
+        LEFT JOIN site_appeals a ON b.id = a.ban_id
+        WHERE b.license = ? OR b.license LIKE ?
+        ORDER BY b.id DESC
+      `, [`steam:${steam_id}`, `%${steam_id}%`]);
+      bans = rows;
+    }
     
     res.json(bans);
   } catch (error) {
@@ -438,7 +436,7 @@ app.get('/api/bans', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/bans/:id/appeal - Create an appeal for a specific ban
+// POST /api/bans/:id/appeal - Create an appeal for a specific ban (verifies against FiveM bans table)
 app.post('/api/bans/:id/appeal', authenticateToken, async (req, res) => {
   try {
     const banId = req.params.id;
@@ -449,33 +447,33 @@ app.post('/api/bans/:id/appeal', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Motivo e link de provas são obrigatórios' });
     }
 
-    // Find the user's ID in the database
-    let userQuery = '';
-    let userParams = [];
+    // Verify the ban exists in FiveM bans table and belongs to this user
+    let banQuery = '';
+    let banParams = [];
     
-    if (steam_id) {
-      userQuery = 'SELECT id FROM users WHERE steam_id = ?';
-      userParams = [steam_id];
-    } else if (discord_id) {
-      userQuery = 'SELECT id FROM users WHERE discord_id = ?';
-      userParams = [discord_id];
+    if (discord_id) {
+      banQuery = 'SELECT * FROM bans WHERE id = ? AND (discord = ? OR discord = ?)';
+      banParams = [banId, discord_id, `discord:${discord_id}`];
+    } else if (steam_id) {
+      banQuery = 'SELECT * FROM bans WHERE id = ? AND (license = ? OR license LIKE ?)';
+      banParams = [banId, `steam:${steam_id}`, `%${steam_id}%`];
+    } else {
+      return res.status(400).json({ error: 'Usuário inválido' });
     }
     
-    const [users] = await pool.execute(userQuery, userParams);
-    if (users.length === 0) return res.status(404).json({ error: 'Usuário não encontrado' });
-    
-    const userId = users[0].id;
-    
-    // Check if ban exists and belongs to user
-    const [bans] = await pool.execute('SELECT * FROM bans WHERE id = ? AND user_id = ?', [banId, userId]);
+    const [bans] = await pool.execute(banQuery, banParams);
     if (bans.length === 0) {
       return res.status(404).json({ error: 'Ban não encontrado ou não pertence a você' });
     }
     
+    // Get the site user ID for the appeal record
+    const userId = await getUserId(req, res);
+    if (!userId) return;
+    
     // Create the appeal
     try {
       await pool.execute(`
-        INSERT INTO appeals (ban_id, user_id, appeal_reason, proof_link)
+        INSERT INTO site_appeals (ban_id, user_id, appeal_reason, proof_link)
         VALUES (?, ?, ?, ?)
       `, [banId, userId, reason, proof_link]);
       
@@ -500,8 +498,8 @@ app.post('/api/bans/:id/appeal', authenticateToken, async (req, res) => {
 async function getUserId(req, res) {
   const { discord_id, steam_id } = req.user;
   let userQuery = '', userParams = [];
-  if (steam_id) { userQuery = 'SELECT id FROM users WHERE steam_id = ?'; userParams = [steam_id]; }
-  else if (discord_id) { userQuery = 'SELECT id FROM users WHERE discord_id = ?'; userParams = [discord_id]; }
+  if (steam_id) { userQuery = 'SELECT id FROM site_users WHERE steam_id = ?'; userParams = [steam_id]; }
+  else if (discord_id) { userQuery = 'SELECT id FROM site_users WHERE discord_id = ?'; userParams = [discord_id]; }
   else { res.status(400).json({ error: 'Usuário inválido' }); return null; }
   const [users] = await pool.execute(userQuery, userParams);
   if (users.length === 0) { res.status(404).json({ error: 'Usuário não encontrado' }); return null; }
@@ -514,7 +512,7 @@ app.get('/api/tickets', authenticateToken, async (req, res) => {
     const userId = await getUserId(req, res);
     if (!userId) return;
     const [tickets] = await pool.execute(
-      'SELECT * FROM tickets WHERE user_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM site_tickets WHERE user_id = ? ORDER BY created_at DESC',
       [userId]
     );
     res.json(tickets);
@@ -534,7 +532,7 @@ app.post('/api/tickets', authenticateToken, async (req, res) => {
     const userId = await getUserId(req, res);
     if (!userId) return;
     const [result] = await pool.execute(
-      'INSERT INTO tickets (user_id, title, category, description) VALUES (?, ?, ?, ?)',
+      'INSERT INTO site_tickets (user_id, title, category, description) VALUES (?, ?, ?, ?)',
       [userId, title, category, description]
     );
     res.status(201).json({ success: true, ticketId: result.insertId });
@@ -551,14 +549,14 @@ app.get('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
     const ticketId = req.params.id;
     
     // First, verify the ticket belongs to the user
-    const [tickets] = await pool.execute('SELECT * FROM tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    const [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
     if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
     
     // Then get messages
     const [messages] = await pool.execute(
       `SELECT tm.*, u.username, u.avatar 
-       FROM ticket_messages tm 
-       JOIN users u ON tm.user_id = u.id 
+       FROM site_ticket_messages tm 
+       JOIN site_users u ON tm.user_id = u.id 
        WHERE tm.ticket_id = ? 
        ORDER BY tm.created_at ASC`,
       [ticketId]
@@ -582,12 +580,12 @@ app.post('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
     if (!message) return res.status(400).json({ error: 'Mensagem vazia' });
     
     // Verify the ticket belongs to the user and is not closed
-    const [tickets] = await pool.execute('SELECT * FROM tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    const [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
     if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
     if (tickets[0].status === 'closed') return res.status(400).json({ error: 'Este ticket está fechado' });
     
     await pool.execute(
-      'INSERT INTO ticket_messages (ticket_id, user_id, message) VALUES (?, ?, ?)',
+      'INSERT INTO site_ticket_messages (ticket_id, user_id, message) VALUES (?, ?, ?)',
       [ticketId, userId, message]
     );
     
@@ -598,17 +596,49 @@ app.post('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
   }
 });
 // =============================================
+// FiveM Server Status Route
+// =============================================
+app.get('/api/server/status', async (req, res) => {
+  try {
+    const serverUrl = process.env.FIVEM_SERVER_URL || 'http://ltUtlDjarNhTZCtzDULT.neon-host.vps:30120';
+    
+    // Fetch dynamic.json for players count
+    const response = await axios.get(`${serverUrl}/dynamic.json`, { timeout: 3000 });
+    const data = response.data;
+    
+    res.json({
+      status: 'online',
+      players: data.clients || 0,
+      maxPlayers: data.sv_maxclients || 1024,
+      queuePosition: 0 // Optional: if you have a queue system, you can fetch its data here
+    });
+  } catch (error) {
+    // If the server is offline or doesn't respond in time
+    res.json({
+      status: 'offline',
+      players: 0,
+      maxPlayers: 1024,
+      queuePosition: 0
+    });
+  }
+});
+
+// =============================================
 // Start Server
 // =============================================
 async function start() {
   try {
-    await initDatabase();
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
       console.log(`🔗 Login Discord: http://localhost:${PORT}/auth/discord`);
     });
+    
+    // Conecta ao BD de forma assíncrona para não travar a API se der erro de Firewall
+    initDatabase().catch(error => {
+      console.error('❌ Erro de conexão com o Banco de Dados (Possível bloqueio de Firewall):', error);
+    });
   } catch (error) {
-    console.error('❌ Erro ao iniciar servidor:', error);
+    console.error('❌ Erro fatal ao iniciar servidor:', error);
     process.exit(1);
   }
 }

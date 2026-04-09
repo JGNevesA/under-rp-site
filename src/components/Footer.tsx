@@ -13,7 +13,7 @@ const Footer = () => {
             <a href="#inicio" className="flex items-center group mb-6 hover:opacity-90 transition-opacity duration-300">
               <Logo variant="icon" iconClassName="h-[42px] w-auto relative top-[-2px]" />
             </a>
-            <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+            <p className="text-gray-400 text-xs tracking-wider uppercase mb-6 leading-relaxed">
               O melhor servidor de GTA V Roleplay do Brasil. Experimente uma gameplay imersiva com 
               sistemas únicos e uma comunidade incrível.
             </p>

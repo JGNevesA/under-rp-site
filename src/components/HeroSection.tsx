@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { Logo } from './Logo';
+import { User } from '../App';
 
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3001'
+  : 'https://under-rp-site.onrender.com';
 
 /* ── SVG Icons ── */
 const SteamIcon = () => (
@@ -30,28 +33,41 @@ const ChartIcon = () => (
   </svg>
 );
 
-const HeroSection = () => {
+const PlayIcon = () => (
+  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M8 5v14l11-7z" />
+  </svg>
+);
+
+const HeroSection = ({ user, onOpenQueue }: { user?: User | null, onOpenQueue: () => void }) => {
   const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   const [stats, setStats] = useState({
-    players: 246,
+    players: 0,
     maxPlayers: 1024,
-    queuePosition: 42,
-    status: 'online' as 'online' | 'offline',
+    queuePosition: 0,
+    status: 'offline' as 'online' | 'offline',
   });
 
-  // Simulated live stats update
+  // Live stats update from API
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        ...prev,
-        players: Math.floor(Math.random() * 30) + 230,
-        queuePosition: Math.floor(Math.random() * 20) + 30,
-      }));
-    }, 5000);
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/server/status`);
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar status do servidor:', error);
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 15000); // Update every 15 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -178,7 +194,7 @@ const HeroSection = () => {
         className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000"
         style={{ backgroundColor: `${theme.primary}0a` }}
       />
-      <canvas ref={canvasRef} className="absolute inset-0 z-[1]" />
+      <canvas ref={canvasRef} className="absolute inset-0 z-[1] pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-[90rem] mx-auto px-6 sm:px-8 lg:px-16 py-10 lg:py-0">
@@ -213,7 +229,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.65 }}
-              className="text-xl md:text-2xl font-semibold mb-4 transition-colors duration-700"
+              className="text-xl md:text-2xl uppercase tracking-wider font-semibold mb-4 transition-colors duration-700"
               style={{ color: theme.primary, fontFamily: 'var(--font-subtitle)', ...parallax(0.1) }}
             >
               A experiência mais imersiva de GTA RP
@@ -224,7 +240,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="text-gray-400 text-lg leading-relaxed max-w-lg mb-8"
+              className="text-gray-400 text-sm uppercase tracking-wide leading-relaxed max-w-lg mb-8"
               style={parallax(0.05)}
             >
               Sua nova vida começa aqui. Faça sua história no maior e mais completo
@@ -324,34 +340,58 @@ const HeroSection = () => {
                 </div>
               </div>
 
+            {/* Play Button - JOGAR AGORA */}
+            {user && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="mt-6 w-full max-w-sm relative z-50 pointer-events-auto"
+                style={parallax(0.3)}
+              >
+                <a
+                  href="fivem://connect/45.146.81.252:30120"
+                  className="w-full flex items-center justify-center px-6 py-4 rounded-xl text-white font-bold text-lg transition-all hover:scale-[1.02] cursor-pointer"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
+                    boxShadow: `0 8px 30px ${theme.glow}`,
+                  }}
+                >
+                  ENTRAR NA FILA
+                </a>
+              </motion.div>
+            )}
+
             {/* Steam & Discord buttons — below card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="flex flex-col sm:flex-row gap-3 mt-6 w-full max-w-sm"
-              style={parallax(0.25)}
-            >
-              <button
-                onClick={handleSteamLogin}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-semibold hover:bg-white/10 transition-all hover:scale-[1.02]"
-                style={{ backdropFilter: 'blur(10px)' }}
+            {!user && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                className="flex flex-col sm:flex-row gap-3 mt-4 w-full max-w-sm relative z-50 pointer-events-auto"
+                style={parallax(0.25)}
               >
-                <SteamIcon />
-                Steam
-              </button>
-              <button
-                onClick={handleDiscordLogin}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-white text-sm font-semibold transition-all hover:scale-[1.02]"
-                style={{
-                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
-                  boxShadow: `0 4px 20px ${theme.glow.replace('0.4', '0.3')}`,
-                }}
-              >
-                <DiscordIcon />
-                Discord
-              </button>
-             </motion.div>
+                <button
+                  onClick={handleSteamLogin}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-semibold hover:bg-white/10 transition-all hover:scale-[1.02] cursor-pointer"
+                  style={{ backdropFilter: 'blur(10px)' }}
+                >
+                  <SteamIcon />
+                  Steam
+                </button>
+                <button
+                  onClick={handleDiscordLogin}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-white text-sm font-semibold transition-all hover:scale-[1.02] cursor-pointer"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
+                    boxShadow: `0 4px 20px ${theme.glow.replace('0.4', '0.3')}`,
+                  }}
+                >
+                  <DiscordIcon />
+                  Discord
+                </button>
+               </motion.div>
+            )}
             </div>
           </motion.div>
 

@@ -74,16 +74,6 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
               {user ? (
                 /* Logged in */
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={onOpenQueue}
-                    className="px-4 py-2 font-bold text-sm rounded-lg transition-all duration-300 text-black"
-                    style={{
-                      background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})`,
-                      boxShadow: `0 4px 15px ${theme.glow.replace('0.4', '0.2')}`,
-                    }}
-                  >
-                    Entrar na fila
-                  </button>
                   <div className="relative">
                     <button
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -180,14 +170,7 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                 <div className="border-t border-white/5 mt-2 pt-4 flex flex-col gap-2">
                   {user && (
                     <div className="flex flex-col gap-3">
-                      <button
-                        onClick={() => { onOpenQueue(); setIsMobileMenuOpen(false); }}
-                        className="w-full py-2.5 font-bold text-sm rounded-lg transition-colors shadow-lg text-center text-black"
-                        style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
-                      >
-                        Entrar na fila
-                      </button>
-                      
+
                       <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3 border border-white/10">
                         <div className="flex items-center gap-3">
                           <img src={user.avatar} alt={user.global_name} className="w-8 h-8 rounded-full" />

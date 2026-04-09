@@ -23,7 +23,7 @@ export interface User {
   source: 'discord' | 'steam';
 }
 
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -85,7 +85,7 @@ function App() {
             <Routes>
               <Route path="/" element={
                 <>
-                  <HeroSection />
+                  <HeroSection user={user} onOpenQueue={() => setIsQueueOpen(true)} />
                   <AboutSection />
                   <RulesSection />
                   <DonationSection />

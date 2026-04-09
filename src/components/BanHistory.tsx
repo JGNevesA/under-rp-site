@@ -32,7 +32,7 @@ interface TicketMessage {
   avatar: string;
 }
 
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://underrp-api.onrender.com';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';
 
 const BanHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
