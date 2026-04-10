@@ -626,11 +626,14 @@ app.get('/api/server/status', async (req, res) => {
 // =============================================
 // Start Server
 // =============================================
+// Healthcheck para o Render
+app.get('/', (req, res) => res.send('API UnderRP Online e Saudável!'));
+
 async function start() {
   try {
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-      console.log(`🔗 Login Discord: http://localhost:${PORT}/auth/discord`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor rodando na porta ${PORT}`);
+      console.log(`🔗 Login Discord configurado na porta ${PORT}`);
     });
     
     // Conecta ao BD de forma assíncrona para não travar a API se der erro de Firewall
