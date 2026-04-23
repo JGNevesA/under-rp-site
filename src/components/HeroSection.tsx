@@ -59,7 +59,11 @@ const HeroSection = ({ user, onOpenQueue }: { user?: User | null, onOpenQueue: (
         const response = await fetch(`${API_URL}/api/server/status`);
         if (response.ok) {
           const data = await response.json();
-          setStats(data);
+          setStats(prev => ({
+            ...data,
+            // Preserve last known maxPlayers when server goes offline
+            maxPlayers: data.maxPlayers > 0 ? data.maxPlayers : prev.maxPlayers,
+          }));
         }
       } catch (error) {
         console.error('Erro ao buscar status do servidor:', error);

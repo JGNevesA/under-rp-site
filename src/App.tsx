@@ -4,7 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import ParticleBackground from './components/ParticleBackground';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
-import AboutSection from './components/AboutSection';
+
 import RulesSection from './components/RulesSection';
 import DonationSection from './components/DonationSection';
 import WhitelistSection from './components/WhitelistSection';
@@ -86,7 +86,7 @@ function App() {
               <Route path="/" element={
                 <>
                   <HeroSection user={user} onOpenQueue={() => setIsQueueOpen(true)} />
-                  <AboutSection />
+
                   <RulesSection />
                   <DonationSection />
                   <WhitelistSection user={user} />

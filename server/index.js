@@ -598,6 +598,10 @@ app.post('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
 // =============================================
 // FiveM Server Status Route
 // =============================================
+
+// Cache do último maxPlayers real do servidor FiveM
+let cachedMaxPlayers = 1024;
+
 app.get('/api/server/status', async (req, res) => {
   try {
     const serverUrl = process.env.FIVEM_SERVER_URL || 'http://ltUtlDjarNhTZCtzDULT.neon-host.vps:30120';
@@ -605,19 +609,24 @@ app.get('/api/server/status', async (req, res) => {
     // Fetch dynamic.json for players count
     const response = await axios.get(`${serverUrl}/dynamic.json`, { timeout: 3000 });
     const data = response.data;
-    
+
+    // Atualiza o cache com o valor real do servidor
+    if (data.sv_maxclients > 0) {
+      cachedMaxPlayers = data.sv_maxclients;
+    }
+
     res.json({
       status: 'online',
       players: data.clients || 0,
-      maxPlayers: data.sv_maxclients || 1024,
-      queuePosition: 0 // Optional: if you have a queue system, you can fetch its data here
+      maxPlayers: cachedMaxPlayers,
+      queuePosition: 0
     });
   } catch (error) {
-    // If the server is offline or doesn't respond in time
+    // Servidor offline: retorna 0 jogadores mas mantém o maxPlayers real (ex: 48)
     res.json({
       status: 'offline',
       players: 0,
-      maxPlayers: 1024,
+      maxPlayers: cachedMaxPlayers,
       queuePosition: 0
     });
   }

@@ -170,7 +170,7 @@ const SupportSection = () => {
               </div>
             </div>
             <a
-              href="https://discord.gg/VWXkSt3Y"
+              href="https://discord.gg/m7U6u9dtyw"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-[#5865F2]/30"

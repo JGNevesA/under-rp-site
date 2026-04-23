@@ -109,7 +109,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-300">Idade mínima 16 anos</p>
+              <p className="text-sm text-gray-300">Idade mínima 18 anos</p>
             </div>
             <div className="bg-white/5 rounded-xl p-4 text-center">
               <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mx-auto mb-3">
@@ -132,7 +132,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
           {/* CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://discord.com/channels/1460473286264750349/1480449093728735314"
+              href="https://discord.com/channels/1460473286264750349/1489128639676022896"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-8 py-4 rounded-xl gold-gradient font-bold text-black text-lg transition-all duration-300 hover:scale-105 glow-gold flex items-center justify-center gap-2"
@@ -144,7 +144,7 @@ const WhitelistSection = ({ user }: WhitelistSectionProps) => {
             </a>
             {user?.discord_id && (
               <a
-                href="https://discord.gg/3f3fQcCu"
+                href="https://discord.gg/m7U6u9dtyw"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-8 py-4 rounded-xl border border-gray-700 font-semibold text-white text-lg transition-all duration-300 hover:bg-white/5 flex items-center justify-center gap-2"

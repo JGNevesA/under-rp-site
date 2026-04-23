@@ -6,12 +6,13 @@ interface StoreItem {
   name: string;
   price: string;
   description: string;
-  category: 'Doações' | 'Veículos' | 'Personagem' | 'Personalização' | 'Propriedades';
+  category: 'Doações' | 'Personagem' | 'Personalização' | 'Moedas';
   icon: string;
   image?: string;
   isPopular?: boolean;
   buttonText?: string;
   weeklyPrice?: string;
+  preaAmount?: number;
 }
 
 const storeItems: StoreItem[] = [
@@ -19,16 +20,16 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-prata',
     name: 'DOAÇÃO PRATA',
-    price: 'R$ 40,00',
-    description: 'Prioridade + veículo C por 1 mês.',
+    price: 'R$ 30,00',
+    description: 'Prioridade Prata (15 de Prioridade) (Bônus de 5 Prea)',
     category: 'Doações',
     icon: '🥈',
   },
   {
     id: 'doacao-ouro',
     name: 'DOAÇÃO OURO',
-    price: 'R$ 80,00',
-    description: 'Prioridade + veículo B por 1 mês.',
+    price: 'R$ 60,00',
+    description: 'Prioridade Ouro (30 de Prioridade) (Bônus de 10 Prea)',
     category: 'Doações',
     icon: '🥇',
     isPopular: true,
@@ -36,24 +37,24 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-esmeralda',
     name: 'DOAÇÃO ESMERALDA',
-    price: 'R$ 110,00',
-    description: 'Prioridade + veículo A.',
+    price: 'R$ 80,00',
+    description: 'Prioridade Esmeralda (40 de Prioridade) (Bônus de 15 Prea)',
     category: 'Doações',
     icon: '💚',
   },
   {
     id: 'doacao-platina',
     name: 'DOAÇÃO PLATINA',
-    price: 'R$ 260,00',
-    description: 'Prioridade + 2 veículos A por 1 mês + 1 placa personalizada.',
+    price: 'R$ 110,00',
+    description: 'Prioridade Platina (65 de Prioridade) (Bônus de 20 Prea)',
     category: 'Doações',
     icon: '👑',
   },
   {
     id: 'doacao-diamante',
     name: 'DOAÇÃO DIAMANTE',
-    price: 'R$ 330,00',
-    description: 'Prioridade + veículo S por 1 mês + placa personalizada + caixa tier I.',
+    price: 'R$ 150,00',
+    description: 'Prioridade Diamante (100 de Prioridade) (Bônus de 25 Prea)',
     category: 'Doações',
     icon: '💎',
     isPopular: true,
@@ -61,69 +62,26 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-under',
     name: 'DOAÇÃO UNDER',
-    price: 'R$ 450,00',
-    description: 'Prioridade + 2 veículos S por 1 mês + 2 placas personalizadas + caixa tier II.',
+    price: 'R$ 200,00',
+    description: 'Prioridade Under (125 de Prioridade) (Bônus de 40 Prea)',
     category: 'Doações',
     icon: '🔥',
-  },
-
-  // Categoria: Veículos
-  {
-    id: 'classe-s',
-    name: 'CLASSE S',
-    price: 'R$ 150,00 / mês',
-    weeklyPrice: 'R$ 70,00 / semana',
-    description: 'Veículos superesportivos de altíssimo desempenho e design exclusivo.',
-    category: 'Veículos',
-    icon: '🏎️',
-    isPopular: true,
-    buttonText: 'Alugar Veículo',
-  },
-  {
-    id: 'classe-a',
-    name: 'CLASSE A',
-    price: 'R$ 75,00 / mês',
-    weeklyPrice: 'R$ 35,00 / semana',
-    description: 'Esportivos modernos com excelente balanço entre velocidade e controle.',
-    category: 'Veículos',
-    icon: '🚘',
-    buttonText: 'Alugar Veículo',
-  },
-  {
-    id: 'classe-b',
-    name: 'CLASSE B',
-    price: 'R$ 50,00 / mês',
-    weeklyPrice: 'R$ 20,00 / semana',
-    description: 'Veículos urbanos tunados e clássicos reformados para o dia a dia.',
-    category: 'Veículos',
-    icon: '🚙',
-    buttonText: 'Alugar Veículo',
-  },
-  {
-    id: 'moto',
-    name: 'MOTOCICLETAS',
-    price: 'R$ 60,00 / mês',
-    weeklyPrice: 'R$ 25,00 / semana',
-    description: 'Motos de alta cilindrada para máxima agilidade em Los Santos.',
-    category: 'Veículos',
-    icon: '🏍️',
-    buttonText: 'Alugar Veículo',
   },
 
   // Categoria: Personalização
   {
     id: 'livery',
     name: 'LIVERY',
-    price: 'R$ 60,00',
-    description: 'Aplicação de livery caso o jogador possua o arquivo.',
+    price: 'R$ 50,00',
+    description: 'Livery que o jogador já tenha o arquivo pronto',
     category: 'Personalização',
     icon: '🎨',
   },
   {
     id: 'livery-perso',
     name: 'LIVERY PERSONALIZADA',
-    price: 'R$ 170,00',
-    description: 'Livery criada do zero pelo servidor.',
+    price: 'R$ 200,00',
+    description: 'Livery a ser criada do 0 pelo servidor',
     category: 'Personalização',
     icon: '🖌️',
     isPopular: true,
@@ -131,16 +89,16 @@ const storeItems: StoreItem[] = [
   {
     id: 'roupa-perso',
     name: 'ROUPA PERSONALIZADA',
-    price: 'R$ 55,00',
-    description: 'Roupa personalizada enviada pelo jogador.',
+    price: 'R$ 50,00',
+    description: 'Roupa que o jogador já possua o arquivo',
     category: 'Personalização',
     icon: '🧥',
   },
   {
     id: 'skin-arma-perso',
-    name: 'SKIN DE ARMA PERSONALIZADA',
-    price: 'R$ 110,00',
-    description: 'Sistema liberado para aplicar skin por link.',
+    name: 'SKIN DE ARMA PERSO',
+    price: 'R$ 100,00',
+    description: 'Será liberado sistema de skin ao jogador',
     category: 'Personalização',
     icon: '🔫',
   },
@@ -148,51 +106,78 @@ const storeItems: StoreItem[] = [
     id: 'placa-perso',
     name: 'PLACA PERSONALIZADA',
     price: 'R$ 25,00',
-    description: 'Placa personalizada por veículo.',
+    description: 'Placa personalizada 1 unidade',
     category: 'Personalização',
     icon: '🚘',
+  },
+  {
+    id: 'troca-veiculo',
+    name: 'TROCA DE VEÍCULO',
+    price: 'R$ 25,00',
+    description: 'Será possibilitada troca de veículo na classe que comprou',
+    category: 'Personalização',
+    icon: '🔄',
   },
 
   // Categoria: Personagem
   {
     id: 'ped',
     name: 'PED',
-    price: 'R$ 80,00',
-    description: 'Inclusão de ped fornecido pelo jogador.',
+    price: 'R$ 70,00',
+    description: 'Inclusão de ped no servidor (fornecido pelo jogador)',
     category: 'Personagem',
     icon: '🧍',
   },
   {
     id: 'att-ped',
     name: 'ATUALIZAÇÃO DE PED',
-    price: 'R$ 30,00',
-    description: 'Atualização visual do seu ped.',
+    price: 'R$ 25,00',
+    description: 'Atualização de PED (fornecido pelo jogador)',
     category: 'Personagem',
     icon: '🛠️',
   },
-  {
-    id: 'slot-personagem',
-    name: 'SLOT PERSONAGEM EXTRA',
-    price: 'R$ 35,00',
-    description: 'Libera um slot adicional de personagem.',
-    category: 'Personagem',
-    icon: '🎭',
-  },
 
-  // Categoria: Propriedades
+  // Categoria: PREA (Moeda do Servidor)
   {
-    id: 'mansoes-perso',
-    name: 'MANSÕES PERSONALIZADAS',
-    price: 'R$ 1.100,00',
-    description: 'Escolha entre 3 mansões nas colinas de Vinewood.',
-    category: 'Propriedades',
-    icon: '🏛️',
-    image: '/mansao.webp',
+    id: 'prea-120',
+    name: 'PREA 120 UNIDADES',
+    price: 'R$ 120,00',
+    description: 'Pacote com 120 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
+    category: 'Moedas',
+    icon: '💰',
+    preaAmount: 120,
     isPopular: true,
+  },
+  {
+    id: 'prea-65',
+    name: 'PREA 65 UNIDADES',
+    price: 'R$ 65,00',
+    description: 'Pacote com 65 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
+    category: 'Moedas',
+    icon: '💰',
+    preaAmount: 65,
+  },
+  {
+    id: 'prea-50',
+    name: 'PREA 50 UNIDADES',
+    price: 'R$ 50,00',
+    description: 'Pacote com 50 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
+    category: 'Moedas',
+    icon: '💰',
+    preaAmount: 50,
+  },
+  {
+    id: 'prea-40',
+    name: 'PREA 40 UNIDADES',
+    price: 'R$ 40,00',
+    description: 'Pacote com 40 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
+    category: 'Moedas',
+    icon: '💰',
+    preaAmount: 40,
   },
 ];
 
-const categories = ['Doações', 'Veículos', 'Personagem', 'Personalização', 'Propriedades'] as const;
+const categories = ['Doações', 'Personagem', 'Personalização', 'Moedas'] as const;
 type Category = typeof categories[number];
 
 const DonationSection = () => {
@@ -225,15 +210,35 @@ const DonationSection = () => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 border ${activeCategory === category
-                ? 'bg-blue-600 border-blue-500 text-white shadow-lg'
-                : 'bg-[#101827] border-white/5 text-slate-400 hover:bg-[#1f2937] hover:border-white/10 hover:text-white'
-                }`}
+              className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 border ${
+                category === 'Moedas'
+                  ? activeCategory === category
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-400 border-amber-400 text-black shadow-lg shadow-amber-500/30'
+                    : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-400/50'
+                  : activeCategory === category
+                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg'
+                    : 'bg-[#101827] border-white/5 text-slate-400 hover:bg-[#1f2937] hover:border-white/10 hover:text-white'
+              }`}
             >
-              {category}
+              {category === 'Moedas' ? '💰 MOEDAS' : category}
             </button>
           ))}
         </div>
+
+        {/* === BANNER PREA === */}
+        {activeCategory === 'Moedas' && (
+          <div className="mb-10 rounded-2xl border border-amber-500/25 bg-gradient-to-r from-amber-500/10 via-yellow-500/5 to-amber-500/10 p-5 flex flex-col sm:flex-row items-center gap-4">
+            <div className="text-4xl flex-shrink-0">💰</div>
+            <div>
+              <h3 className="text-amber-300 font-bold text-lg mb-1" style={{ fontFamily: 'var(--font-subtitle)' }}>
+                O que é PREA?
+              </h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                <span className="text-amber-400 font-semibold">PREA</span> é a moeda oficial do servidor. Com ela, você pode trocar por <span className="text-white font-medium">qualquer item disponível na loja in-game</span> — veículos, roupas, skins, placas e muito mais. Compre seu pacote e gaste como quiser dentro da cidade!
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* === GRID DE CARDS PREMIUM === */}
         {filteredItems.length > 0 ? (
@@ -343,7 +348,7 @@ const DonationSection = () => {
 
                   {/* Botão premium */}
                   <a
-                    href="https://discord.gg/VWXkSt3Y"
+                    href="https://discord.gg/m7U6u9dtyw"
                     target="_blank"
                     rel="noopener noreferrer"
                     id={`btn-${item.id}`}
