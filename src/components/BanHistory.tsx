@@ -257,7 +257,7 @@ const BanHistory = () => {
         {/* Header - Only show "VOCÊ ESTÁ BANIDO :(" if there are bans */}
         <header className="text-center mb-10 text-left md:text-center">
           <Link to="/" className="inline-block mb-6 text-[#71717a] hover:text-white transition-colors text-sm font-semibold uppercase tracking-wider">
-            &larr; Voltar para a Home
+            &larr; Voltar para o Início
           </Link>
           {bans.length > 0 && (
             <h1 
@@ -277,7 +277,7 @@ const BanHistory = () => {
           <div className="text-center bg-[#18181b] border border-white/10 p-10 rounded-2xl">
             <h2 className="text-2xl font-bold mb-4">Você precisa estar logado</h2>
             <p className="text-[#a1a1aa] mb-6">Conecte-se com sua conta do Discord ou Steam para ver seus tickets e punições.</p>
-            <Link to="/" className="bg-[#f59e0b] text-black px-6 py-3 rounded-lg font-bold">Fazer Login na Home</Link>
+            <Link to="/" className="bg-[#f59e0b] text-black px-6 py-3 rounded-lg font-bold">Fazer Login na Tela Inicial</Link>
           </div>
         )}
 
