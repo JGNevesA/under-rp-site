@@ -55,7 +55,7 @@ const RulesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold mb-6 mt-4" style={{ fontFamily: 'var(--font-headline)' }}>
-            Regras da <span className="gold-text">Cidade</span>
+            Regras da <span className="gradient-text">Cidade</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Pra cidade fluir legal e todo mundo se divertir fazendo aquele RP brabo, tem que andar na linha. Dá uma lida aqui antes de tomar punição de bobeira.

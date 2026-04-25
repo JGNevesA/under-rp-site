@@ -90,7 +90,7 @@ const MonthlyVehicles = () => {
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight" style={{ fontFamily: 'var(--font-headline)' }}>
                         Veículos{' '}
-                        <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">
+                        <span className="gradient-text">
                             Mensais
                         </span>
                     </h2>

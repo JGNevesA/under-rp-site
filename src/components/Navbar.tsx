@@ -81,6 +81,11 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                     >
                       <img src={user.avatar} alt={user.global_name} className="w-7 h-7 rounded-full" />
                       <span className="text-sm font-medium text-white max-w-[100px] truncate">{user.global_name}</span>
+                      {user.is_admin && (
+                        <span className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                          Admin
+                        </span>
+                      )}
                       <svg className={`w-4 h-4 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -175,7 +180,14 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
                         <div className="flex items-center gap-3">
                           <img src={user.avatar} alt={user.global_name} className="w-8 h-8 rounded-full" />
                           <div>
-                            <p className="text-sm font-medium text-white">{user.global_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium text-white">{user.global_name}</p>
+                              {user.is_admin && (
+                                <span className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                                  Admin
+                                </span>
+                              )}
+                            </div>
                             <p className="text-xs text-gray-400">@{user.username}</p>
                           </div>
                         </div>

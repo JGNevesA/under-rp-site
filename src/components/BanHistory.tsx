@@ -261,10 +261,9 @@ const BanHistory = () => {
           </Link>
           {bans.length > 0 && (
             <h1 
-              className="font-poppins text-4xl md:text-5xl font-extrabold uppercase tracking-tight"
+              className="font-poppins text-4xl md:text-5xl font-extrabold uppercase tracking-tight gradient-text pb-1"
               style={{ 
-                color: '#facc15', 
-                textShadow: '0 0 30px rgba(250, 204, 21, 0.25)' 
+                textShadow: '0 0 30px var(--theme-glow)' 
               }}
             >
               VOCÊ ESTÁ BANIDO :(
@@ -277,7 +276,7 @@ const BanHistory = () => {
           <div className="text-center bg-[#18181b] border border-white/10 p-10 rounded-2xl">
             <h2 className="text-2xl font-bold mb-4">Você precisa estar logado</h2>
             <p className="text-[#a1a1aa] mb-6">Conecte-se com sua conta do Discord ou Steam para ver seus tickets e punições.</p>
-            <Link to="/" className="bg-[#f59e0b] text-black px-6 py-3 rounded-lg font-bold">Fazer Login na Tela Inicial</Link>
+            <Link to="/" className="theme-button text-black px-6 py-3 rounded-lg font-bold">Fazer Login na Tela Inicial</Link>
           </div>
         )}
 
@@ -299,7 +298,7 @@ const BanHistory = () => {
                   {/* Header */}
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide mb-1">
+                      <h2 className="font-poppins text-2xl font-bold gradient-text uppercase tracking-wide mb-1 w-max">
                         TICKET DE SUPORTE
                       </h2>
                       <p className="text-xs text-[#71717a] mt-1">Título</p>
@@ -389,7 +388,7 @@ const BanHistory = () => {
                       <button
                         type="submit"
                         disabled={sendingMessage || !newMessage.trim()}
-                        className="self-end bg-[#f59e0b] hover:bg-[#facc15] disabled:opacity-40 text-black px-6 py-3 rounded-lg text-sm font-bold transition-all"
+                        className="self-end theme-button disabled:opacity-40 text-black px-6 py-3 rounded-lg text-sm font-bold transition-all"
                       >
                         {sendingMessage ? 'Enviando...' : 'Enviar'}
                       </button>
@@ -405,10 +404,10 @@ const BanHistory = () => {
                 /* === TICKET LIST VIEW === */
                 <>
                   <div className="flex justify-between items-center mb-8">
-                    <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide">
+                    <h2 className="font-poppins text-2xl font-bold gradient-text uppercase tracking-wide w-max">
                       TICKETS DE SUPORTE
                     </h2>
-                    <button onClick={openNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black px-5 py-2 rounded-md text-sm font-bold transition-all shadow-[0_0_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_18px_rgba(250,204,21,0.35)]">
+                    <button onClick={openNewTicket} className="theme-button text-black px-5 py-2 rounded-md text-sm font-bold transition-all">
                       + Novo
                     </button>
                   </div>
@@ -473,7 +472,7 @@ const BanHistory = () => {
             {/* Ban history section */}
             {bans.length > 0 && (
               <div>
-                <h3 className="font-poppins text-lg font-bold text-[#facc15] uppercase tracking-wide mb-3 px-1">Histórico de Punições</h3>
+                <h3 className="font-poppins text-lg font-bold gradient-text uppercase tracking-wide mb-3 px-1 w-max">Histórico de Punições</h3>
                 <div className="flex flex-col gap-3">
                 {bans.map((ban) => {
                     const config = getStatusConfig(ban);
@@ -596,7 +595,7 @@ const BanHistory = () => {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="bg-[#f59e0b] hover:bg-[#facc15] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none text-black px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all"
+                  className="theme-button hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none text-black px-6 py-3 rounded-lg font-bold uppercase tracking-wide text-sm transition-all"
                 >
                   {isSubmitting ? 'Enviando...' : 'Enviar Apelo'}
                 </button>
@@ -621,7 +620,7 @@ const BanHistory = () => {
             <div className="p-8">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="font-poppins text-xl font-extrabold text-[#facc15] uppercase tracking-widest">
+                  <h2 className="font-poppins text-xl font-extrabold gradient-text uppercase tracking-widest w-max">
                     Novo Ticket
                   </h2>
                   <p className="text-xs text-[#52525b] mt-0.5">Preencha os campos abaixo. Nossa equipe responderá em breve.</p>
@@ -643,7 +642,7 @@ const BanHistory = () => {
                   </div>
                   <h3 className="text-white font-bold text-lg mb-2">Ticket enviado!</h3>
                   <p className="text-[#71717a] text-sm mb-6">Nossa equipe vai analisar e responder em breve.<br/>Fique de olho no painel de tickets.</p>
-                  <button onClick={closeNewTicket} className="bg-[#f59e0b] hover:bg-[#facc15] text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
+                  <button onClick={closeNewTicket} className="theme-button text-black font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
                     Fechar
                   </button>
                 </div>
@@ -698,7 +697,7 @@ const BanHistory = () => {
                     <button
                       type="submit"
                       disabled={ticketSubmitting}
-                      className="bg-[#f59e0b] hover:bg-[#facc15] disabled:opacity-60 text-black font-bold px-6 py-2.5 rounded-lg transition-all text-sm shadow-[0_0_16px_rgba(245,158,11,0.25)] hover:shadow-[0_0_24px_rgba(250,204,21,0.4)]"
+                      className="theme-button disabled:opacity-60 text-black font-bold px-6 py-2.5 rounded-lg transition-all text-sm"
                     >
                       {ticketSubmitting ? 'Enviando...' : 'Abrir Chamado →'}
                     </button>

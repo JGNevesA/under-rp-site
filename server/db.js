@@ -43,6 +43,7 @@ export async function initDatabase() {
         email VARCHAR(255),
         access_token TEXT,
         refresh_token TEXT,
+        is_admin BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
@@ -54,6 +55,10 @@ export async function initDatabase() {
     
     try {
       await connection.execute(`ALTER TABLE site_users MODIFY discord_id VARCHAR(255) NULL`);
+    } catch (e) {}
+
+    try {
+      await connection.execute(`ALTER TABLE site_users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE`);
     } catch (e) {}
 
     await connection.execute(`

@@ -159,7 +159,7 @@ app.get('/auth/discord', (req, res) => {
     client_id: process.env.DISCORD_CLIENT_ID,
     redirect_uri: process.env.DISCORD_REDIRECT_URI,
     response_type: 'code',
-    scope: 'identify email',
+    scope: 'identify email guilds guilds.members.read',
   });
 
   res.redirect(`https://discord.com/api/oauth2/authorize?${params.toString()}`);
@@ -183,7 +183,7 @@ app.get('/auth/discord/callback', async (req, res) => {
         grant_type: 'authorization_code',
         code,
         redirect_uri: process.env.DISCORD_REDIRECT_URI,
-        scope: 'identify email',
+        scope: 'identify email guilds guilds.members.read',
       }),
       {
         headers: { 
@@ -207,6 +207,27 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     const discordUser = userResponse.data;
 
+    // Check if user is Admin in the configured Discord Server
+    let isAdmin = false;
+    if (process.env.DISCORD_GUILD_ID && process.env.DISCORD_ADMIN_ROLE_ID) {
+      try {
+        const memberResponse = await axios.get(
+          `https://discord.com/api/users/@me/guilds/${process.env.DISCORD_GUILD_ID}/member`,
+          {
+            headers: { 
+              Authorization: `Bearer ${access_token}`,
+              'Accept': 'application/json',
+              'User-Agent': 'UnderRP-Auth/1.0 (https://underrp-api.onrender.com)'
+            },
+          }
+        );
+        const roles = memberResponse.data.roles || [];
+        isAdmin = roles.includes(process.env.DISCORD_ADMIN_ROLE_ID);
+      } catch (error) {
+        console.log(`⚠️ Usuário ${discordUser.username} não está no servidor ou ocorreu um erro ao buscar o cargo:`, error.message);
+      }
+    }
+
     // Check if we are linking
     let existingUserId = null;
     if (req.session && req.session.linkToken) {
@@ -229,14 +250,14 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     if (existingUserId) {
       await pool.execute(
-        `UPDATE site_users SET discord_id = ?, email = ?, access_token = ?, refresh_token = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-        [discordUser.id, discordUser.email || null, access_token, refresh_token || null, existingUserId]
+        `UPDATE site_users SET discord_id = ?, email = ?, access_token = ?, refresh_token = ?, is_admin = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        [discordUser.id, discordUser.email || null, access_token, refresh_token || null, isAdmin, existingUserId]
       );
     } else {
       // Save or update user in database
       await pool.execute(
-        `INSERT INTO site_users (discord_id, username, global_name, avatar, email, access_token, refresh_token)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO site_users (discord_id, username, global_name, avatar, email, access_token, refresh_token, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
            username = VALUES(username),
            global_name = VALUES(global_name),
@@ -244,6 +265,7 @@ app.get('/auth/discord/callback', async (req, res) => {
            email = VALUES(email),
            access_token = VALUES(access_token),
            refresh_token = VALUES(refresh_token),
+           is_admin = VALUES(is_admin),
            updated_at = CURRENT_TIMESTAMP`,
         [
           discordUser.id,
@@ -253,6 +275,7 @@ app.get('/auth/discord/callback', async (req, res) => {
           discordUser.email || null,
           access_token,
           refresh_token || null,
+          isAdmin
         ]
       );
     }
@@ -265,6 +288,7 @@ app.get('/auth/discord/callback', async (req, res) => {
         username: discordUser.username,
         global_name: discordUser.global_name || discordUser.username,
         avatar: discordUser.avatar,
+        is_admin: isAdmin,
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -332,6 +356,7 @@ app.get('/auth/me', async (req, res) => {
       global_name: dbUser.global_name,
       avatar: avatarUrl,
       source: decoded.source,
+      is_admin: Boolean(dbUser.is_admin),
     });
   } catch (error) {
     return res.status(401).json({ error: 'Token inválido ou expirado' });

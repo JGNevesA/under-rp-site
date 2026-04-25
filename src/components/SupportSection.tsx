@@ -84,7 +84,7 @@ const SupportSection = () => {
             <span className="text-violet-400 font-medium">Central de Ajuda</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: 'var(--font-headline)' }}>
-            Precisa de <span className="text-sky-400">Ajuda</span>?
+            Precisa de <span className="gradient-text">Ajuda</span>?
           </h2>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
             Nossa equipe está pronta para ajudar você. Escolha a melhor forma de entrar em contato.

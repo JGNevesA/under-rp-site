@@ -104,6 +104,18 @@ h4 {
   background-clip: text;
 }
 
+/* ====== Dynamic Theme Button ====== */
+
+.theme-button {
+  background: linear-gradient(135deg, var(--theme-gradient-from), var(--theme-gradient-to));
+  box-shadow: 0 0 12px var(--theme-glow);
+}
+
+.theme-button:hover {
+  box-shadow: 0 0 18px var(--theme-glow);
+}
+
+
 /* ====== Glow Effects ====== */
 
 .glow-theme {

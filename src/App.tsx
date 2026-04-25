@@ -21,6 +21,7 @@ export interface User {
   global_name: string;
   avatar: string;
   source: 'discord' | 'steam';
+  is_admin?: boolean;
 }
 
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';

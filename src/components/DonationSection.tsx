@@ -197,7 +197,7 @@ const DonationSection = () => {
             <span className="text-amber-300 font-semibold tracking-wide uppercase text-xs">Apoie o Servidor</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight" style={{ fontFamily: 'var(--font-headline)' }}>
-            Loja de <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Doações</span>
+            Loja de <span className="gradient-text">Doações</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             Adquira vantagens exclusivas e apoie o crescimento do UNDER RP.
