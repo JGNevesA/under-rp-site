@@ -435,9 +435,9 @@ const BanHistory = () => {
                         <div key={msg.id} className="bg-[#18181b] border border-white/5 rounded-lg p-5">
                           <div className="flex items-center gap-3 mb-3">
                             <img
-                              src={msg.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                              alt={msg.username}
-                              className="w-9 h-9 rounded-full"
+                              src={msg.is_staff ? '/logos/icon neutro.png' : (msg.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png')}
+                              alt={msg.is_staff ? 'UnderRP Suporte' : msg.username}
+                              className={`w-9 h-9 ${msg.is_staff ? 'rounded-md object-contain bg-white/5 border border-[#facc15]/20 p-1' : 'rounded-full'}`}
                             />
                             <div>
                               <span className={`font-bold text-sm ${msg.is_staff ? 'text-[#facc15]' : 'text-[#a1a1aa]'}`}>
