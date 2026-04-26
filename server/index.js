@@ -423,6 +423,28 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
+// Middleware to require admin role
+const requireAdmin = async (req, res, next) => {
+  // First run authenticateToken to set req.user
+  const { discord_id, steam_id, is_admin } = req.user || {};
+
+  // Check JWT claim first (fast path)
+  if (is_admin) return next();
+
+  // Double-check from database (in case JWT is stale)
+  try {
+    let userQuery = '', userParams = [];
+    if (discord_id) { userQuery = 'SELECT is_admin FROM site_users WHERE discord_id = ?'; userParams = [discord_id]; }
+    else if (steam_id) { userQuery = 'SELECT is_admin FROM site_users WHERE steam_id = ?'; userParams = [steam_id]; }
+    else return res.status(403).json({ error: 'Acesso negado' });
+
+    const [rows] = await pool.execute(userQuery, userParams);
+    if (rows.length > 0 && rows[0].is_admin) return next();
+  } catch (e) {}
+
+  return res.status(403).json({ error: 'Acesso negado. Apenas administradores.' });
+};
+
 // GET /api/bans - Get all bans for the logged-in user (reads directly from FiveM bans table)
 app.get('/api/bans', authenticateToken, async (req, res) => {
   try {
@@ -572,51 +594,170 @@ app.get('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
     const userId = await getUserId(req, res);
     if (!userId) return;
     const ticketId = req.params.id;
-    
-    // First, verify the ticket belongs to the user
-    const [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    const { is_admin, discord_id, steam_id } = req.user;
+
+    // Check admin from DB if JWT doesn't have is_admin
+    let isAdminUser = Boolean(is_admin);
+    if (!isAdminUser) {
+      try {
+        let q = '', p = [];
+        if (discord_id) { q = 'SELECT is_admin FROM site_users WHERE discord_id = ?'; p = [discord_id]; }
+        else if (steam_id) { q = 'SELECT is_admin FROM site_users WHERE steam_id = ?'; p = [steam_id]; }
+        if (q) { const [r] = await pool.execute(q, p); isAdminUser = r.length > 0 && Boolean(r[0].is_admin); }
+      } catch(e) {}
+    }
+
+    // Admins can view any ticket; regular users only their own
+    let tickets;
+    if (isAdminUser) {
+      [tickets] = await pool.execute(
+        `SELECT t.*, u.username as owner_username, u.avatar as owner_avatar 
+         FROM site_tickets t 
+         JOIN site_users u ON t.user_id = u.id 
+         WHERE t.id = ?`,
+        [ticketId]
+      );
+    } else {
+      [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    }
     if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
     
     // Then get messages
     const [messages] = await pool.execute(
-      `SELECT tm.*, u.username, u.avatar 
+      `SELECT tm.*, u.username, u.avatar, u.discord_id
        FROM site_ticket_messages tm 
        JOIN site_users u ON tm.user_id = u.id 
        WHERE tm.ticket_id = ? 
        ORDER BY tm.created_at ASC`,
       [ticketId]
     );
+
+    // Build avatar URLs for messages
+    const messagesWithAvatars = messages.map(msg => {
+      let avatar = msg.avatar;
+      if (msg.discord_id && (!avatar || !avatar.startsWith('http'))) {
+        avatar = msg.avatar
+          ? `https://cdn.discordapp.com/avatars/${msg.discord_id}/${msg.avatar}.png?size=64`
+          : `https://cdn.discordapp.com/embed/avatars/${parseInt(msg.discord_id || 0) % 5}.png`;
+      }
+      return { ...msg, avatar };
+    });
     
-    res.json({ ticket: tickets[0], messages });
+    res.json({ ticket: tickets[0], messages: messagesWithAvatars, isAdmin: isAdminUser });
   } catch (error) {
     console.error('Erro ao buscar mensagens:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
 
-// POST /api/tickets/:id/messages - Add message to ticket
+// POST /api/tickets/:id/messages - Add message to ticket (user or admin)
 app.post('/api/tickets/:id/messages', authenticateToken, async (req, res) => {
   try {
     const userId = await getUserId(req, res);
     if (!userId) return;
     const ticketId = req.params.id;
     const { message } = req.body;
+    const { is_admin, discord_id, steam_id } = req.user;
     
     if (!message) return res.status(400).json({ error: 'Mensagem vazia' });
+
+    // Check admin
+    let isAdminUser = Boolean(is_admin);
+    if (!isAdminUser) {
+      try {
+        let q = '', p = [];
+        if (discord_id) { q = 'SELECT is_admin FROM site_users WHERE discord_id = ?'; p = [discord_id]; }
+        else if (steam_id) { q = 'SELECT is_admin FROM site_users WHERE steam_id = ?'; p = [steam_id]; }
+        if (q) { const [r] = await pool.execute(q, p); isAdminUser = r.length > 0 && Boolean(r[0].is_admin); }
+      } catch(e) {}
+    }
     
-    // Verify the ticket belongs to the user and is not closed
-    const [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    // Verify ticket exists; admins can reply to any ticket, users only to their own
+    let tickets;
+    if (isAdminUser) {
+      [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ?', [ticketId]);
+    } else {
+      [tickets] = await pool.execute('SELECT * FROM site_tickets WHERE id = ? AND user_id = ?', [ticketId, userId]);
+    }
     if (tickets.length === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
-    if (tickets[0].status === 'closed') return res.status(400).json({ error: 'Este ticket está fechado' });
+    if (tickets[0].status === 'closed') return res.status(400).json({ error: 'Este ticket está finalizado' });
     
+    const isStaff = isAdminUser ? 1 : 0;
+
     await pool.execute(
-      'INSERT INTO site_ticket_messages (ticket_id, user_id, message) VALUES (?, ?, ?)',
-      [ticketId, userId, message]
+      'INSERT INTO site_ticket_messages (ticket_id, user_id, message, is_staff) VALUES (?, ?, ?, ?)',
+      [ticketId, userId, message, isStaff]
     );
+
+    // If admin replied, automatically set status to 'in_progress' (Aguardando Resposta)
+    if (isAdminUser && tickets[0].status === 'open') {
+      await pool.execute(
+        'UPDATE site_tickets SET status = ? WHERE id = ?',
+        ['in_progress', ticketId]
+      );
+    }
     
     res.status(201).json({ success: true });
   } catch (error) {
     console.error('Erro ao enviar mensagem:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// GET /api/admin/tickets - Get ALL tickets (admin only)
+app.get('/api/admin/tickets', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.query;
+    let query = `
+      SELECT t.*, u.username as owner_username, u.global_name as owner_global_name,
+             u.avatar as owner_avatar, u.discord_id as owner_discord_id
+      FROM site_tickets t
+      JOIN site_users u ON t.user_id = u.id
+    `;
+    const params = [];
+    if (status && status !== 'all') {
+      query += ' WHERE t.status = ?';
+      params.push(status);
+    }
+    query += ' ORDER BY t.updated_at DESC';
+
+    const [tickets] = await pool.execute(query, params);
+
+    // Build owner avatar URLs
+    const ticketsWithAvatars = tickets.map(t => {
+      let ownerAvatar = t.owner_avatar;
+      if (t.owner_discord_id && (!ownerAvatar || !ownerAvatar.startsWith('http'))) {
+        ownerAvatar = t.owner_avatar
+          ? `https://cdn.discordapp.com/avatars/${t.owner_discord_id}/${t.owner_avatar}.png?size=64`
+          : `https://cdn.discordapp.com/embed/avatars/${parseInt(t.owner_discord_id || 0) % 5}.png`;
+      }
+      return { ...t, owner_avatar: ownerAvatar };
+    });
+
+    res.json(ticketsWithAvatars);
+  } catch (error) {
+    console.error('Erro ao buscar todos os tickets:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// PATCH /api/tickets/:id/status - Update ticket status (admin only)
+app.patch('/api/tickets/:id/status', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const { status } = req.body;
+    const validStatuses = ['open', 'in_progress', 'closed'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Status inválido. Use: open, in_progress ou closed' });
+    }
+    const [result] = await pool.execute(
+      'UPDATE site_tickets SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [status, ticketId]
+    );
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'Ticket não encontrado' });
+    res.json({ success: true, status });
+  } catch (error) {
+    console.error('Erro ao atualizar status do ticket:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });

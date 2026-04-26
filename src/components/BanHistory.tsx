@@ -19,6 +19,11 @@ interface Ticket {
   description: string;
   status: 'open' | 'in_progress' | 'closed';
   created_at: string;
+  updated_at?: string;
+  // Admin-only fields
+  owner_username?: string;
+  owner_global_name?: string;
+  owner_avatar?: string;
 }
 
 interface TicketMessage {
@@ -32,6 +37,13 @@ interface TicketMessage {
   avatar: string;
 }
 
+// Status config helper
+const TICKET_STATUS: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  open:        { label: 'Pendente',            color: '#facc15', bg: 'bg-[#facc15]', border: 'border-[#facc15]/30' },
+  in_progress: { label: 'Aguardando Resposta', color: '#36c0ff', bg: 'bg-[#36c0ff]', border: 'border-[#36c0ff]/30' },
+  closed:      { label: 'Finalizado',          color: '#71717a', bg: 'bg-[#71717a]', border: 'border-[#71717a]/30' },
+};
+
 const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';
 
 const BanHistory = () => {
@@ -44,6 +56,14 @@ const BanHistory = () => {
   const [ticketSubmitting, setTicketSubmitting] = useState(false);
   const [ticketSuccess, setTicketSuccess] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+
+  // Admin panel state
+  const [activeTab, setActiveTab] = useState<'user' | 'admin'>('user');
+  const [adminTickets, setAdminTickets] = useState<Ticket[]>([]);
+  const [adminFilter, setAdminFilter] = useState<'all' | 'open' | 'in_progress' | 'closed'>('all');
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   const CATEGORIES = ['Dúvidas Gerais', 'Apelo de Punição', 'Problema com Compra', 'Report de Jogador', 'Report de Staff', 'Bug / Erro no Servidor', 'Sugestão', 'Outro'];
 
@@ -132,13 +152,17 @@ const BanHistory = () => {
         body: JSON.stringify({ message: newMessage })
       });
       if (res.ok) {
-        // Refetch messages
+        // Refetch messages and ticket (status may have changed if admin replied)
         const msgRes = await fetch(`${API_URL}/api/tickets/${selectedTicket.id}/messages`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (msgRes.ok) {
           const data = await msgRes.json();
           setTicketMessages(data.messages);
+          setSelectedTicket(data.ticket);
+          // Sync status update into lists
+          setTickets(prev => prev.map(t => t.id === data.ticket.id ? { ...t, status: data.ticket.status } : t));
+          setAdminTickets(prev => prev.map(t => t.id === data.ticket.id ? { ...t, status: data.ticket.status } : t));
         }
         setNewMessage('');
       }
@@ -164,12 +188,17 @@ const BanHistory = () => {
 
     const fetchData = async () => {
       try {
-        const [bansRes, ticketsRes] = await Promise.all([
+        const [bansRes, ticketsRes, meRes] = await Promise.all([
           fetch(`${API_URL}/api/bans`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_URL}/api/tickets`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         if (bansRes.ok) setBans(await bansRes.json());
         if (ticketsRes.ok) setTickets(await ticketsRes.json());
+        if (meRes.ok) {
+          const me = await meRes.json();
+          setIsAdminMode(Boolean(me.is_admin));
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -179,6 +208,50 @@ const BanHistory = () => {
 
     fetchData();
   }, [token]);
+
+  // Fetch all tickets for admin panel
+  const fetchAdminTickets = async (filter: string = 'all') => {
+    if (!token) return;
+    setAdminLoading(true);
+    try {
+      const url = filter === 'all'
+        ? `${API_URL}/api/admin/tickets`
+        : `${API_URL}/api/admin/tickets?status=${filter}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) setAdminTickets(await res.json());
+    } catch (e) {
+      console.error('Erro ao buscar tickets admin');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  // Update ticket status (admin only)
+  const updateTicketStatus = async (ticketId: number, status: string) => {
+    if (!token) return;
+    setUpdatingStatus(true);
+    try {
+      const res = await fetch(`${API_URL}/api/tickets/${ticketId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        const ts = TICKET_STATUS[status] || TICKET_STATUS.open;
+        // Update in adminTickets list
+        setAdminTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: status as Ticket['status'] } : t));
+        // Update in selectedTicket
+        setSelectedTicket(prev => prev && prev.id === ticketId ? { ...prev, status: status as Ticket['status'] } : prev);
+        // Update in user tickets list too
+        setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: status as Ticket['status'] } : t));
+        void ts;
+      }
+    } catch (e) {
+      alert('Erro ao atualizar status');
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
 
   const openAppealModal = (banId: number, targetName: string, reason: string) => {
     setAppealTarget({ banId, targetName, reason });
@@ -313,13 +386,26 @@ const BanHistory = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-[#71717a]">Estado</p>
-                        <span className={`text-sm font-bold px-3 py-1 rounded border ${
-                          selectedTicket.status === 'open' ? 'text-[#facc15] border-[#facc15]/30 bg-[#facc15]/10' :
-                          selectedTicket.status === 'in_progress' ? 'text-[#36c0ff] border-[#36c0ff]/30 bg-[#36c0ff]/10' :
-                          'text-[#71717a] border-[#71717a]/30 bg-[#71717a]/10'
-                        }`}>
-                          {selectedTicket.status === 'open' ? 'Aberto' : selectedTicket.status === 'in_progress' ? 'Em Andamento' : 'Fechado'}
-                        </span>
+                        {isAdminMode ? (
+                          <select
+                            value={selectedTicket.status}
+                            disabled={updatingStatus}
+                            onChange={e => updateTicketStatus(selectedTicket.id, e.target.value)}
+                            className="text-sm font-bold bg-[#18181b] border border-white/10 rounded px-2 py-1 text-white focus:outline-none focus:border-[#f59e0b]/50 cursor-pointer disabled:opacity-60"
+                          >
+                            <option value="open" className="bg-[#18181b]">Pendente</option>
+                            <option value="in_progress" className="bg-[#18181b]">Aguardando Resposta</option>
+                            <option value="closed" className="bg-[#18181b]">Finalizado</option>
+                          </select>
+                        ) : (
+                          <span className={`text-sm font-bold px-3 py-1 rounded border ${
+                            selectedTicket.status === 'open' ? 'text-[#facc15] border-[#facc15]/30 bg-[#facc15]/10' :
+                            selectedTicket.status === 'in_progress' ? 'text-[#36c0ff] border-[#36c0ff]/30 bg-[#36c0ff]/10' :
+                            'text-[#71717a] border-[#71717a]/30 bg-[#71717a]/10'
+                          }`}>
+                            {TICKET_STATUS[selectedTicket.status]?.label || 'Pendente'}
+                          </span>
+                        )}
                       </div>
                       <button
                         onClick={closeTicketChat}
@@ -380,7 +466,7 @@ const BanHistory = () => {
                       <textarea
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Digite sua mensagem..."
+                        placeholder={isAdminMode ? 'Responder como ⭐ UnderRP Suporte...' : 'Digite sua mensagem...'}
                         required
                         rows={3}
                         className="flex-1 bg-[#18181b] border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-[#52525b] focus:outline-none focus:border-[#f59e0b]/50 resize-none"
@@ -395,18 +481,34 @@ const BanHistory = () => {
                     </form>
                   ) : (
                     <div className="text-center py-4 bg-[#18181b] border border-white/5 rounded-lg">
-                      <p className="text-[#71717a] text-sm">Este ticket está fechado. Se precisar de mais ajuda, abra um novo ticket.</p>
+                      <p className="text-[#71717a] text-sm">Este ticket está finalizado. {!isAdminMode && 'Se precisar de mais ajuda, abra um novo ticket.'}</p>
+                      {isAdminMode && (
+                        <button
+                          onClick={() => updateTicketStatus(selectedTicket.id, 'open')}
+                          className="mt-2 text-xs text-[#facc15] hover:underline font-semibold"
+                        >Reabrir ticket</button>
+                      )}
                     </div>
                   )}
                 </div>
 
-              ) : (
-                /* === TICKET LIST VIEW === */
+              ) : activeTab === 'user' ? (
+                /* === TICKET LIST VIEW (USER) === */
                 <>
                   <div className="flex justify-between items-center mb-8">
-                    <h2 className="font-poppins text-2xl font-bold gradient-text uppercase tracking-wide w-max">
-                      TICKETS DE SUPORTE
-                    </h2>
+                    <div className="flex items-center gap-3">
+                      <h2 className="font-poppins text-2xl font-bold gradient-text uppercase tracking-wide w-max">
+                        TICKETS DE SUPORTE
+                      </h2>
+                      {isAdminMode && (
+                        <button
+                          onClick={() => { setActiveTab('admin'); fetchAdminTickets(adminFilter); }}
+                          className="ml-2 px-3 py-1 rounded text-xs font-bold bg-[#facc15]/10 border border-[#facc15]/30 text-[#facc15] hover:bg-[#facc15]/20 transition-all"
+                        >
+                          🛡️ Painel Admin
+                        </button>
+                      )}
+                    </div>
                     <button onClick={openNewTicket} className="theme-button text-black px-5 py-2 rounded-md text-sm font-bold transition-all">
                       + Novo
                     </button>
@@ -415,7 +517,7 @@ const BanHistory = () => {
                   <div className="flex border-b border-white/10 pb-4 mb-6 text-sm font-bold text-white">
                     <div className="w-44 pl-2">Categoria</div>
                     <div className="flex-1">Titulo</div>
-                    <div className="w-28 text-center">Estado</div>
+                    <div className="w-36 text-center">Estado</div>
                     <div className="w-40 text-right">Ultima Atualização</div>
                     <div className="w-28 text-center">Ação</div>
                   </div>
@@ -427,12 +529,7 @@ const BanHistory = () => {
                   ) : (
                     <div className="flex flex-col gap-3">
                       {tickets.map((ticket) => {
-                        const statusMap: Record<string, { label: string; color: string; bg: string }> = {
-                          open: { label: 'Aberto', color: '#facc15', bg: 'bg-[#facc15]' },
-                          in_progress: { label: 'Em Andamento', color: '#36c0ff', bg: 'bg-[#36c0ff]' },
-                          closed: { label: 'Fechado', color: '#71717a', bg: 'bg-[#71717a]' },
-                        };
-                        const ts = statusMap[ticket.status] || statusMap.open;
+                        const ts = TICKET_STATUS[ticket.status] || TICKET_STATUS.open;
                         return (
                           <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
                             <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
@@ -445,7 +542,7 @@ const BanHistory = () => {
                               <h3 className="font-semibold text-white mb-1">{ticket.title.length > 50 ? `${ticket.title.substring(0, 50)}...` : ticket.title}</h3>
                               <p className="text-xs text-[#71717a]">UnderRP</p>
                             </div>
-                            <div className="w-28 text-center">
+                            <div className="w-36 text-center">
                               <span className="text-sm font-bold" style={{ color: ts.color }}>{ts.label}</span>
                             </div>
                             <div className="w-40 text-right text-sm text-[#a1a1aa]">
@@ -458,6 +555,102 @@ const BanHistory = () => {
                                 className="bg-white/5 hover:bg-white/10 text-white px-4 py-1.5 rounded text-xs font-bold transition-all border border-white/10"
                               >
                                 Visualizar
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* === ADMIN PANEL VIEW === */
+                <>
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setActiveTab('user')}
+                        className="text-[#71717a] hover:text-white text-sm font-semibold transition-colors"
+                      >
+                        ← Meus Tickets
+                      </button>
+                      <h2 className="font-poppins text-2xl font-bold text-[#facc15] uppercase tracking-wide w-max">
+                        🛡️ PAINEL ADMIN
+                      </h2>
+                    </div>
+                    <button
+                      onClick={() => fetchAdminTickets(adminFilter)}
+                      disabled={adminLoading}
+                      className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 rounded text-xs font-bold transition-all disabled:opacity-50"
+                    >
+                      {adminLoading ? 'Carregando...' : '↻ Atualizar'}
+                    </button>
+                  </div>
+
+                  {/* Filter tabs */}
+                  <div className="flex gap-2 mb-6">
+                    {(['all', 'open', 'in_progress', 'closed'] as const).map(f => {
+                      const labels: Record<string, string> = { all: 'Todos', open: 'Pendente', in_progress: 'Aguardando Resposta', closed: 'Finalizado' };
+                      return (
+                        <button
+                          key={f}
+                          onClick={() => { setAdminFilter(f); fetchAdminTickets(f); }}
+                          className={`px-3 py-1.5 rounded text-xs font-bold border transition-all ${
+                            adminFilter === f
+                              ? 'bg-[#facc15]/20 border-[#facc15]/40 text-[#facc15]'
+                              : 'bg-white/5 border-white/10 text-[#71717a] hover:text-white'
+                          }`}
+                        >
+                          {labels[f]}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {adminLoading ? (
+                    <div className="text-center py-10 text-[#a1a1aa] animate-pulse">Carregando tickets...</div>
+                  ) : adminTickets.length === 0 ? (
+                    <div className="text-center py-10">
+                      <p className="text-[#52525b] font-medium text-sm">Nenhum ticket encontrado</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      {adminTickets.map((ticket) => {
+                        const ts = TICKET_STATUS[ticket.status] || TICKET_STATUS.open;
+                        return (
+                          <article key={ticket.id} className="bg-[#18181b] border border-white/5 rounded-lg p-4 flex items-center hover:bg-white/5 transition-colors relative overflow-hidden">
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${ts.bg}`}></div>
+                            {/* Owner avatar */}
+                            <div className="pl-4 pr-3">
+                              <img
+                                src={ticket.owner_avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                                alt={ticket.owner_username || 'User'}
+                                className="w-8 h-8 rounded-full border border-white/10"
+                                title={ticket.owner_global_name || ticket.owner_username || 'User'}
+                              />
+                            </div>
+                            <div className="w-36">
+                              <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold uppercase tracking-wider bg-white/5 text-[#a1a1aa] border border-white/10 whitespace-nowrap">
+                                {ticket.category}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-white mb-0.5 truncate">{ticket.title}</h3>
+                              <p className="text-xs text-[#52525b]">{ticket.owner_global_name || ticket.owner_username}</p>
+                            </div>
+                            <div className="w-36 text-center">
+                              <span className="text-sm font-bold" style={{ color: ts.color }}>{ts.label}</span>
+                            </div>
+                            <div className="w-36 text-right text-sm text-[#a1a1aa] pr-2">
+                              {new Date(ticket.updated_at || ticket.created_at).toLocaleDateString('pt-BR')}<br/>
+                              <span className="text-xs text-[#52525b]">{new Date(ticket.updated_at || ticket.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="w-24 text-center">
+                              <button
+                                onClick={() => openTicketChat(ticket)}
+                                className="bg-[#facc15]/10 hover:bg-[#facc15]/20 text-[#facc15] border border-[#facc15]/30 px-3 py-1.5 rounded text-xs font-bold transition-all"
+                              >
+                                Responder
                               </button>
                             </div>
                           </article>
