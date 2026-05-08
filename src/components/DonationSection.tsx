@@ -13,6 +13,7 @@ interface StoreItem {
   buttonText?: string;
   weeklyPrice?: string;
   preaAmount?: number;
+  tebexUrl?: string;
 }
 
 const storeItems: StoreItem[] = [
@@ -20,7 +21,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-prata',
     name: 'DOAÇÃO PRATA',
-    price: 'R$ 30,00',
+    price: '$ 30,00',
     description: 'Prioridade Prata (15 de Prioridade) (Bônus de 5 Prea)',
     category: 'Doações',
     icon: '🥈',
@@ -28,7 +29,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-ouro',
     name: 'DOAÇÃO OURO',
-    price: 'R$ 60,00',
+    price: '$ 60,00',
     description: 'Prioridade Ouro (30 de Prioridade) (Bônus de 10 Prea)',
     category: 'Doações',
     icon: '🥇',
@@ -37,7 +38,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-esmeralda',
     name: 'DOAÇÃO ESMERALDA',
-    price: 'R$ 80,00',
+    price: '$ 80,00',
     description: 'Prioridade Esmeralda (40 de Prioridade) (Bônus de 15 Prea)',
     category: 'Doações',
     icon: '💚',
@@ -45,7 +46,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-platina',
     name: 'DOAÇÃO PLATINA',
-    price: 'R$ 110,00',
+    price: '$ 110,00',
     description: 'Prioridade Platina (65 de Prioridade) (Bônus de 20 Prea)',
     category: 'Doações',
     icon: '👑',
@@ -53,7 +54,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-diamante',
     name: 'DOAÇÃO DIAMANTE',
-    price: 'R$ 150,00',
+    price: '$ 150,00',
     description: 'Prioridade Diamante (100 de Prioridade) (Bônus de 25 Prea)',
     category: 'Doações',
     icon: '💎',
@@ -62,7 +63,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'doacao-under',
     name: 'DOAÇÃO UNDER',
-    price: 'R$ 200,00',
+    price: '$ 200,00',
     description: 'Prioridade Under (125 de Prioridade) (Bônus de 40 Prea)',
     category: 'Doações',
     icon: '🔥',
@@ -72,7 +73,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'livery',
     name: 'LIVERY',
-    price: 'R$ 50,00',
+    price: '$ 50,00',
     description: 'Livery que o jogador já tenha o arquivo pronto',
     category: 'Personalização',
     icon: '🎨',
@@ -80,7 +81,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'livery-perso',
     name: 'LIVERY PERSONALIZADA',
-    price: 'R$ 200,00',
+    price: '$ 200,00',
     description: 'Livery a ser criada do 0 pelo servidor',
     category: 'Personalização',
     icon: '🖌️',
@@ -89,7 +90,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'roupa-perso',
     name: 'ROUPA PERSONALIZADA',
-    price: 'R$ 50,00',
+    price: '$ 50,00',
     description: 'Roupa que o jogador já possua o arquivo',
     category: 'Personalização',
     icon: '🧥',
@@ -97,7 +98,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'skin-arma-perso',
     name: 'SKIN DE ARMA PERSO',
-    price: 'R$ 100,00',
+    price: '$ 100,00',
     description: 'Será liberado sistema de skin ao jogador',
     category: 'Personalização',
     icon: '🔫',
@@ -105,7 +106,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'placa-perso',
     name: 'PLACA PERSONALIZADA',
-    price: 'R$ 25,00',
+    price: '$ 25,00',
     description: 'Placa personalizada 1 unidade',
     category: 'Personalização',
     icon: '🚘',
@@ -113,7 +114,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'troca-veiculo',
     name: 'TROCA DE VEÍCULO',
-    price: 'R$ 25,00',
+    price: '$ 25,00',
     description: 'Será possibilitada troca de veículo na classe que comprou',
     category: 'Personalização',
     icon: '🔄',
@@ -123,7 +124,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'ped',
     name: 'PED',
-    price: 'R$ 70,00',
+    price: '$ 70,00',
     description: 'Inclusão de ped no servidor (fornecido pelo jogador)',
     category: 'Personagem',
     icon: '🧍',
@@ -131,7 +132,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'att-ped',
     name: 'ATUALIZAÇÃO DE PED',
-    price: 'R$ 25,00',
+    price: '$ 25,00',
     description: 'Atualização de PED (fornecido pelo jogador)',
     category: 'Personagem',
     icon: '🛠️',
@@ -141,7 +142,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'prea-120',
     name: 'PREA 120 UNIDADES',
-    price: 'R$ 120,00',
+    price: '$ 120,00',
     description: 'Pacote com 120 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
     category: 'Moedas',
     icon: '💰',
@@ -151,7 +152,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'prea-65',
     name: 'PREA 65 UNIDADES',
-    price: 'R$ 65,00',
+    price: '$ 65,00',
     description: 'Pacote com 65 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
     category: 'Moedas',
     icon: '💰',
@@ -160,7 +161,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'prea-50',
     name: 'PREA 50 UNIDADES',
-    price: 'R$ 50,00',
+    price: '$ 50,00',
     description: 'Pacote com 50 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
     category: 'Moedas',
     icon: '💰',
@@ -169,7 +170,7 @@ const storeItems: StoreItem[] = [
   {
     id: 'prea-40',
     name: 'PREA 40 UNIDADES',
-    price: 'R$ 40,00',
+    price: '$ 40,00',
     description: 'Pacote com 40 unidades de PREA — a moeda oficial do servidor, trocável por qualquer item da loja in-game.',
     category: 'Moedas',
     icon: '💰',
@@ -348,7 +349,7 @@ const DonationSection = () => {
 
                   {/* Botão premium */}
                   <a
-                    href="https://discord.gg/m7U6u9dtyw"
+                    href={item.tebexUrl || "https://under-roleplay.tebex.io"}
                     target="_blank"
                     rel="noopener noreferrer"
                     id={`btn-${item.id}`}
@@ -363,7 +364,7 @@ const DonationSection = () => {
                     {/* Shimmer */}
                     <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                     <span className="relative z-10 text-white drop-shadow-sm">
-                      {item.buttonText || '💜 Doar'}
+                      {item.buttonText || '🛒 Comprar'}
                     </span>
                   </a>
                   </div>

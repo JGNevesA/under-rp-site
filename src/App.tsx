@@ -7,7 +7,6 @@ import HeroSection from './components/HeroSection';
 
 import RulesSection from './components/RulesSection';
 import DonationSection from './components/DonationSection';
-import WhitelistSection from './components/WhitelistSection';
 import SupportSection from './components/SupportSection';
 import Footer from './components/Footer';
 import QueueModal from './components/QueueModal';
@@ -24,7 +23,7 @@ export interface User {
   is_admin?: boolean;
 }
 
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://api.underrp.com.br';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -84,16 +83,10 @@ function App() {
           <Navbar user={user} setUser={setUser} onOpenQueue={() => setIsQueueOpen(true)} />
           <main>
             <Routes>
-              <Route path="/" element={
-                <>
-                  <HeroSection user={user} onOpenQueue={() => setIsQueueOpen(true)} />
-
-                  <RulesSection />
-                  <DonationSection />
-                  <WhitelistSection user={user} />
-                  <SupportSection />
-                </>
-              } />
+              <Route path="/" element={<HeroSection user={user} onOpenQueue={() => setIsQueueOpen(true)} />} />
+              <Route path="/regras" element={<RulesSection />} />
+              <Route path="/doacoes" element={<DonationSection />} />
+              <Route path="/suporte" element={<SupportSection />} />
               <Route path="/bans" element={<BanHistory />} />
             </Routes>
           </main>

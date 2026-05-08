@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { User } from '../App';
 import { useTheme } from '../contexts/ThemeContext';
 import { Logo } from './Logo';
@@ -29,12 +30,10 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
   };
 
   const navItems = [
-    { name: 'Início', href: '/#inicio' },
-    { name: 'Sobre', href: '/#sobre' },
-    { name: 'Regras', href: '/#regras' },
-    { name: 'Doações', href: '/#doacoes' },
-    { name: 'Suporte', href: '/#suporte' },
-    { name: 'Whitelist', href: '/#whitelist' },
+    { name: 'Início', href: '/' },
+    { name: 'Regras', href: '/regras' },
+    { name: 'Doações', href: '/doacoes' },
+    { name: 'Suporte', href: '/suporte' },
   ];
 
   return (
@@ -51,21 +50,21 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <a href="/#inicio" className="flex items-center group hover:opacity-90 transition-opacity duration-300">
+            <Link to="/" className="flex items-center group hover:opacity-90 transition-opacity duration-300">
               <Logo variant="icon" iconClassName="h-[42px] w-auto relative top-[-2px]" />
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200"
                   style={{ fontFamily: 'var(--font-subtitle)' }}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -162,14 +161,14 @@ const Navbar = ({ user, setUser, onOpenQueue }: NavbarProps) => {
             >
               <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-2">
                 {navItems.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-all"
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
 
                 <div className="border-t border-white/5 mt-2 pt-4 flex flex-col gap-2">

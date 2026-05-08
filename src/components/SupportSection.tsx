@@ -5,18 +5,6 @@ const SupportSection = () => {
     {
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-      ),
-      title: 'Chat ao Vivo',
-      description: 'Converse diretamente com nossa equipe de suporte em tempo real.',
-      action: 'Iniciar Chat',
-      iconBg: 'bg-gradient-to-br from-violet-500 to-indigo-600',
-      href: 'https://discord.com/channels/1460473286264750349/1480725578817732749',
-    },
-    {
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
         </svg>
       ),
@@ -26,46 +14,8 @@ const SupportSection = () => {
       iconBg: 'bg-gradient-to-br from-amber-400 to-yellow-600',
       to: '/bans',
     },
-    {
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-      title: 'Base de Conhecimento',
-      description: 'Encontre respostas para as perguntas mais frequentes.',
-      action: 'Ver FAQ',
-      iconBg: 'bg-gradient-to-br from-emerald-400 to-teal-600',
-    },
-
   ];
 
-  const faqItems = [
-    {
-      question: 'Como faço para entrar no servidor?',
-      answer: 'Você precisa completar o processo de whitelist em nosso Discord e ter o GTA V original na Steam.',
-    },
-    {
-      question: 'Posso trocar meus benefícios?',
-      answer: 'Benefícios de doações não são transferíveis entre contas, mas podem ser trocados dentro do jogo.',
-    },
-    {
-      question: 'Quais são os requisitos mínimos?',
-      answer: 'GTA V original, FiveM instalado, microfone funcional e idade mínima de 16 anos.',
-    },
-    {
-      question: 'Como reportar um jogador?',
-      answer: 'Use o comando /report no jogo ou abra um ticket em nosso Discord com provas.',
-    },
-    {
-      question: 'Como funciona o sistema de doações?',
-      answer: 'As doações são processadas automaticamente e os benefícios são entregues em até 24 horas.',
-    },
-    {
-      question: 'O servidor tem wipe?',
-      answer: 'Realizamos wipes parciais a cada 3-4 meses para manter a economia balanceada.',
-    },
-  ];
 
   return (
     <section id="suporte" className="py-24 relative">
@@ -92,7 +42,7 @@ const SupportSection = () => {
         </div>
 
         {/* Support Options Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+        <div className="grid grid-cols-1 max-w-sm mx-auto gap-6 mb-20">
           {supportOptions.map((option, index) => {
             const CardWrapper = option.href || option.to ? (option.to ? Link : 'a') : 'div';
             const extraProps = option.href 
@@ -125,37 +75,7 @@ const SupportSection = () => {
           })}
         </div>
 
-        {/* FAQ Section */}
         <div className="max-w-5xl mx-auto">
-          <div className="bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-xl rounded-3xl border border-white/10 p-8 md:p-12">
-            <h3 className="text-3xl sm:text-4xl font-bold text-white text-center mb-10" style={{ fontFamily: 'var(--font-headline)' }}>
-              Perguntas Frequentes
-            </h3>
-
-            {/* FAQ Grid */}
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-8">
-              {faqItems.map((item, index) => (
-                <div key={index} className="border-b border-white/10 pb-6">
-                  <h4 className="text-base font-bold text-white mb-2" style={{ fontFamily: 'var(--font-subtitle)' }}>{item.question}</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">{item.answer}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* View All Link */}
-            <div className="text-center mt-8">
-              <a
-                href="#"
-                className="inline-flex items-center gap-1 text-violet-400 hover:text-violet-300 font-medium transition-colors"
-              >
-                Ver todas as perguntas
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
           {/* Discord CTA Bar */}
           <div className="mt-6 bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">

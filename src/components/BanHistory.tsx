@@ -44,7 +44,7 @@ const TICKET_STATUS: Record<string, { label: string; color: string; bg: string; 
   closed:      { label: 'Finalizado',          color: '#71717a', bg: 'bg-[#71717a]', border: 'border-[#71717a]/30' },
 };
 
-const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://under-rp-site.onrender.com';
+const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://api.underrp.com.br';
 
 const BanHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

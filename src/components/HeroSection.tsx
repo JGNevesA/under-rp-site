@@ -6,7 +6,7 @@ import { User } from '../App';
 
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3001'
-  : 'https://under-rp-site.onrender.com';
+  : 'https://api.underrp.com.br';
 
 /* ── SVG Icons ── */
 const SteamIcon = () => (
